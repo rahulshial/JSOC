@@ -21,7 +21,7 @@ import Logout from './pages/Logout';
 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     return (
     <div className="App">
@@ -29,16 +29,16 @@ function App() {
       <Router>
         <Navbar />
         <Switch>
-          <Route exact path="/"><Home /></Route>
-          <Route path="/AboutUs"><AboutUs /></Route>
-          <Route path="/Events"><Events /></Route>
-          <Route path="/News"><News /></Route>
-          <Route path="/Resources"><Resources /></Route>
-          <Route path="/MemberArea"><MemberArea /></Route>
+          <Route exact path="/">       <Home /></Route>
+          <Route path="/AboutUs">      <AboutUs /></Route>
+          <Route path="/Events">       <Events /></Route>
+          <Route path="/News">         <News /></Route>
+          <Route path="/Resources">    <Resources /></Route>
+          <Route path="/MemberArea">   <MemberArea /></Route>
           <Route path="/ExecutiveArea"><ExecutiveArea /></Route>
-          <Route path="/ContactUs"><ContactUs /></Route>
-          <Route path="/Login"><Login /></Route>
-          <Route path="/Logout"><Logout /></Route>
+          <Route path="/ContactUs">    <ContactUs /></Route>
+          <Route path="/Login">        <Login /></Route>
+          <Route path="/Logout">       <Logout /></Route>
         </Switch>
       </Router>
     </div>

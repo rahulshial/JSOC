@@ -52,10 +52,10 @@ export default function Navbar() {
 
   let AuthButton, MemberArea, ExecutiveArea;
    if (isLoggedIn) {
-      AuthButton = <Link className="item-nav" to="/Logout">Logout</Link>;
+      AuthButton = <Link className="item-nav" to="/Logout">    Logout</Link>;
       MemberArea = <Link className="item-nav" to="/MemberArea">MemberArea</Link>;
     } else {
-      AuthButton = <Link className="item-nav" to="/Login">Login</Link>;
+      AuthButton = <Link className="item-nav" to="/Login">     Login</Link>;
     }
   return (
     <div className={classes.root}>
@@ -66,10 +66,10 @@ export default function Navbar() {
             <MenuIcon />
           </IconButton>
           <img src='logo.png' alt="logo" className={classes.logo}></img>
-          <Link className="item-nav" to="/">Home</Link>
-          <Link className="item-nav" to="/AboutUs">About Us</Link>
-          <Link className="item-nav" to="/Events">Events</Link>
-          <Link className="item-nav" to="/News">News</Link>
+          <Link className="item-nav" to="/">         Home</Link>
+          <Link className="item-nav" to="/AboutUs">  About Us</Link>
+          <Link className="item-nav" to="/Events">   Events</Link>
+          <Link className="item-nav" to="/News">     News</Link>
           <Link className="item-nav" to="/Resources">Resources</Link>
           {MemberArea}
           {AuthButton}

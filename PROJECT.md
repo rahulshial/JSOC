@@ -84,4 +84,38 @@
      * Member list
      * Filter on zipCode, Gender, Age, Annual fees paid, what else
 
+# Entities / Databases
 
+1. User Database 
+  - fixed 10 users which will be board members, with type as EC (Executive Committee), DIR(Director)
+  - other members will have type MEM(Member) - each MEM type user will have a entry in User_Detail
+  - login with email & password
+
+
+2. User_Detail
+  - details about each MEM type record from the User database.
+  - form the backbone of the member database for the community.
+  - Please see the Member Database structure.xlsx for details.
+
+3. Events
+  - ID
+  - Event Title
+  - Event Description
+  - Event Venue
+  - Start_date
+  - End_Date
+  - Start_time
+  - End_time
+  - RSVP_Required?
+
+4. Newsletters
+  - recommended to store files on the file system, and just add a reference in the DB (a field with the file path and name). Several reasons:
+  Faster, Easier to access (don't need any special application), Faster backups, Less space
+  - how to store files on the file-system?
+
+5. Resource Links
+  - Links to resources 
+    - Audio
+    - Video
+    - Literature
+    
