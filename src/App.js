@@ -7,17 +7,9 @@ import {
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import './App.css';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import AboutUs from './pages/AboutUs';
-import Events from './pages/Events';
-import News from './pages/News';
-import Resources from './pages/Resources';
-import Login from './pages/Login';
-import MemberArea from './pages/MemberArea';
-import ExecutiveArea from './pages/ExecutiveArea';
-import ContactUs from './pages/ContactUs';
-import Logout from './pages/Logout';
+// import Navbar   from './components/Navbar';
+
+import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, Logout, MemberArea, News, Resources, SignUp } from './components'
 
 
 function App() {

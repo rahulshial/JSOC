@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+export function Login() {
   const classes = useStyles();
 
   const validateId = () => {

@@ -1,5 +1,5 @@
 
-export default function Resources() {
+export function Resources() {
 
   return (
     <div>

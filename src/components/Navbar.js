@@ -9,15 +9,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 /** Local Imports */
 import './Navbar.css';
-// import Home from '../pages/Home';
-// import AboutUs from '../pages/AboutUs';
-// import Events from '../pages/Events';
-// import News from '../pages/News';
-// import Resources from '../pages/Resources';
-// import MemberArea from '../pages/MemberArea';
-// import Login from '../pages/Login';
-// import ExecutiveArea from '../pages/ExecutiveArea';
-// import ContactUs from '../pages/ContactUs';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,9 +37,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Navbar() {
+export function Navbar() {
   const classes = useStyles();
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   let AuthButton, MemberArea, ExecutiveArea;
    if (isLoggedIn) {
