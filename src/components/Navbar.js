@@ -42,6 +42,7 @@ export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   let AuthButton, MemberArea, ExecutiveArea;
+
    if (isLoggedIn) {
       AuthButton = <Link className="item-nav" to="/Logout">    Logout</Link>;
       MemberArea = <Link className="item-nav" to="/MemberArea">MemberArea</Link>;

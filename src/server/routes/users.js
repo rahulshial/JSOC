@@ -6,8 +6,6 @@ const sqlConnection = require('../lib/db');
 Router.get("/:email&:password", (req, res) => {
   const email = req.params.email;
   const password = req.params.password;
-  // const email = 'calgaryjains@gmail.com';
-  // const password = '1234';
 
   console.log(email);
   console.log(password);

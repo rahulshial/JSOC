@@ -52,7 +52,8 @@ export function Login() {
   
   const [state, setState] = useState({
     email:'',
-    password: ''
+    password: '',
+    whatIsMyState: false
   });
 
   const setEmail = (event) => {
@@ -69,17 +70,25 @@ export function Login() {
     }));
   };
 
-  const validateId = () => {
+  const validateId = (event) => {
+    event.preventDefault();
     console.log('Submitted');
     console.log(state.email);
-    // alert(state.email);
-    axios.get(`/users/${state.email}&${state.password}`)
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    
+    alert(state.email);
+    axios
+      .get(`/users/${state.email}&${state.password}`)
+      .then((res) => {
+        console.log(res);
+        console.log('cats');
+        setState((prev) => ({
+          ...prev,
+          whatIsMyState: true,
+        }));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const resetPassword = () => {
@@ -90,6 +99,7 @@ export function Login() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+        {state.whatIsMyState ? <h1> Test </h1>: <h1>Failed</h1>}
         <form className={classes.form} validate='true'>
           <TextField 
             variant="outlined"
@@ -116,7 +126,7 @@ export function Login() {
             fullWidth variant="contained" 
             color="primary" 
             className={classes.submit}
-            onClick={validateId}>
+            onClick={(event) => {validateId(event)}}>
             Sign In
           </Button>
           <Grid container>
