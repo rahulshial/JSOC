@@ -1,5 +1,4 @@
 /** React Imports */
-
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -50,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 export function Login() {
   const classes = useStyles();
+  
   const [state, setState] = useState({
     email:'',
     password: ''
@@ -72,7 +72,7 @@ export function Login() {
   const validateId = () => {
     console.log('Submitted');
     console.log(state.email);
-    alert(state.email);
+    // alert(state.email);
     axios.get(`/users/${state.email}&${state.password}`)
     .then((res) => {
       console.log(res);

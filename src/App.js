@@ -13,7 +13,7 @@ import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, Logout,
 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     return (
     <div className="App">
