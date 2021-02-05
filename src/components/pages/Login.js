@@ -14,7 +14,8 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import BottomNavigation from '@material-ui/core/BottomNavigation';
+import Chip from "@material-ui/core/Chip";
+import FaceIcon from "@material-ui/icons/Face";
 
 /** Local Imports */
 
@@ -30,6 +31,14 @@ const Copyright = () => {
 }
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    "& > *": {
+      margin: theme.spacing(0.5)
+    }
+  },
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
@@ -56,6 +65,7 @@ export function Login() {
   const [state, setState] = useState({
     email:'',
     password: '',
+    loginError: false,
   });
   const setEmail = (event) => {
     setState((prev) => ({
@@ -78,13 +88,21 @@ export function Login() {
     axios
       .get(`/users/${state.email}&${state.password}`)
       .then((res) => {
-        const email = state.email;
-        const type = res.data[0].type;
-        setCookie("userLogged", { email, type }, { path: "/" });
-        history.push('/home');
-        // console.log(history)
-        history.go(history.length - 1);
-        window.location.reload(false);
+        console.log(res);
+        if (res.data.length > 0) {
+          const email = state.email;
+          const type = res.data[0].type;
+          setCookie("userLogged", { email, type }, { path: "/" });
+          history.push('/');
+          history.go(history.length - 1);
+          window.location.reload();
+          }
+        else {
+          setState((prev) => ({
+            ...prev,
+            loginError: true,
+          }));
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -99,6 +117,16 @@ export function Login() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+        {state.loginError? 
+          <div className={classes.root}>
+            <Chip
+              className={classes.smallOverlay}
+              icon={<FaceIcon />}
+              label="Email / Password combination does not exist"
+              color="secondary"
+            />
+          </div>
+          : <></>}
         <form className={classes.form} validate='true'>
           <TextField 
             variant="outlined"

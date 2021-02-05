@@ -22,6 +22,7 @@ Router.get("/:email&:password", (req, res) => {
       console.log(row);
       res.send(row);
     } else {
+      res.send(err);
       console.log("Error retrieving users data!!!");
     };
   });
