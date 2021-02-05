@@ -1,3 +1,5 @@
+use jsoc_db;
+
 INSERT INTO users (email, password, type) VALUES
 ('calgaryjains@gmail.com', '1234', 'EC'),
 ('president.jsoc@gmail.com', '1234', 'EC'),
@@ -9,4 +11,4 @@ INSERT INTO users (email, password, type) VALUES
 ('newidea.jsoc@gmail.com', '1234', 'DIR'),
 ('webcomm.jsoc@gmail.com', '1234', 'DIR'),
 ('pathshala@gmail.com', '1234', 'DIR'),
-('rahul.shial@gmail.com', '1234', 'MEM'),
+('rahul.shial@gmail.com', '1234', 'MEM');

@@ -1,4 +1,9 @@
-// import React from 'react';
+/** React Imports */
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+/** Material UI imports */
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -10,7 +15,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 
-function Copyright() {
+/** Local Imports */
+
+const Copyright = () => {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
@@ -43,9 +50,36 @@ const useStyles = makeStyles((theme) => ({
 
 export function Login() {
   const classes = useStyles();
+  const [state, setState] = useState({
+    email:'',
+    password: ''
+  });
+
+  const setEmail = (event) => {
+    setState((prev) => ({
+      ...prev,
+      email: event.target.value,
+    }));
+  };
+
+  const setPassword = (event) => {
+    setState((prev) => ({
+      ...prev,
+      password: event.target.value,
+    }));
+  };
 
   const validateId = () => {
     console.log('Submitted');
+    console.log(state.email);
+    alert(state.email);
+    axios.get(`/users/${state.email}&${state.password}`)
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   };
 
   const resetPassword = () => {
@@ -57,11 +91,32 @@ export function Login() {
       <CssBaseline />
       <div className={classes.paper}>
         <form className={classes.form} validate='true'>
-          <TextField variant="outlined" margin="normal" required fullWidth id="email" type="email"
-            label="Email Address" name="email" autoComplete="email" autoFocus />
-          <TextField variant="outlined" margin="normal" required fullWidth name="password"
-            label="Password" type="password" id="password" autoComplete="current-password" />
-          <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit} onClick={validateId}>
+          <TextField 
+            variant="outlined"
+            margin="normal" 
+            required fullWidth id="email" 
+            type="email"
+            label="Email Address" 
+            name="email" 
+            autoComplete="email" 
+            autoFocus 
+            onChange={setEmail}/>
+          <TextField 
+            variant="outlined" 
+            margin="normal" 
+            required fullWidth 
+            name="password"
+            label="Password" 
+            type="password" 
+            id="password" 
+            autoComplete="current-password"
+            onChange={setPassword}/>
+          <Button 
+            type="submit" 
+            fullWidth variant="contained" 
+            color="primary" 
+            className={classes.submit}
+            onClick={validateId}>
             Sign In
           </Button>
           <Grid container>
