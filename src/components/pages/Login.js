@@ -1,6 +1,8 @@
 /** React Imports */
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useCookies } from "react-cookie";
+import { useHistory } from 'react-router-dom';
 
 /** Material UI imports */
 import Button from '@material-ui/core/Button';
@@ -49,13 +51,13 @@ const useStyles = makeStyles((theme) => ({
 
 export function Login() {
   const classes = useStyles();
-  
+  const [cookies, setCookie] = useCookies(["name"]);
+  const history = useHistory();
   const [state, setState] = useState({
     email:'',
     password: '',
     whatIsMyState: false
   });
-
   const setEmail = (event) => {
     setState((prev) => ({
       ...prev,
@@ -74,17 +76,17 @@ export function Login() {
     event.preventDefault();
     console.log('Submitted');
     console.log(state.email);
-    
-    alert(state.email);
     axios
       .get(`/users/${state.email}&${state.password}`)
       .then((res) => {
-        console.log(res);
-        console.log('cats');
         setState((prev) => ({
           ...prev,
           whatIsMyState: true,
         }));
+        const email = state.email;
+        const type = res.data[0].type;
+        setCookie("userLogged", { email, type }, { path: "/" });
+        history.push('/home');
       })
       .catch((error) => {
         console.log(error);

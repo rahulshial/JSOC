@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
+
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -40,15 +42,29 @@ const useStyles = makeStyles((theme) => ({
 export function Navbar() {
   const classes = useStyles();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cookies, setCookie] = useCookies(["name"]);
 
   let AuthButton, MemberArea, ExecutiveArea;
-
-   if (isLoggedIn) {
+  if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+    // console.log(cookies);
+    if(cookies.userLogged.type === 'EC') {
+      AuthButton = <Link className="item-nav" to="/Logout">    Logout</Link>;
+      ExecutiveArea = <Link className="item-nav" to="/ExecutiveArea">ExecutiveArea</Link>;
+    } else if(cookies.userLogged.type === 'MEM') {
       AuthButton = <Link className="item-nav" to="/Logout">    Logout</Link>;
       MemberArea = <Link className="item-nav" to="/MemberArea">MemberArea</Link>;
-    } else {
-      AuthButton = <Link className="item-nav" to="/Login">     Login</Link>;
-    }
+    };    
+  } else {
+    AuthButton = <Link className="item-nav" to="/Login">     Login</Link>;
+  };
+
+  //  if (isLoggedIn) {
+  //     AuthButton = <Link className="item-nav" to="/Logout">    Logout</Link>;
+  //     MemberArea = <Link className="item-nav" to="/MemberArea">MemberArea</Link>;
+  //   } else {
+  //     AuthButton = <Link className="item-nav" to="/Login">     Login</Link>;
+  //   }
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -64,6 +80,7 @@ export function Navbar() {
           <Link className="item-nav" to="/News">     News</Link>
           <Link className="item-nav" to="/Resources">Resources</Link>
           {MemberArea}
+          {ExecutiveArea}
           {AuthButton}
         </Toolbar>
       </AppBar>
