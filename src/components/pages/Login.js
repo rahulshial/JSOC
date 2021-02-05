@@ -56,7 +56,6 @@ export function Login() {
   const [state, setState] = useState({
     email:'',
     password: '',
-    whatIsMyState: false
   });
   const setEmail = (event) => {
     setState((prev) => ({
@@ -79,14 +78,13 @@ export function Login() {
     axios
       .get(`/users/${state.email}&${state.password}`)
       .then((res) => {
-        setState((prev) => ({
-          ...prev,
-          whatIsMyState: true,
-        }));
         const email = state.email;
         const type = res.data[0].type;
         setCookie("userLogged", { email, type }, { path: "/" });
         history.push('/home');
+        // console.log(history)
+        history.go(history.length - 1);
+        window.location.reload(false);
       })
       .catch((error) => {
         console.log(error);
@@ -101,7 +99,6 @@ export function Login() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {state.whatIsMyState ? <h1> Test </h1>: <h1>Failed</h1>}
         <form className={classes.form} validate='true'>
           <TextField 
             variant="outlined"
