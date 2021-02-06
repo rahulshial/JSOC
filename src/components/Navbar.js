@@ -1,5 +1,5 @@
 /** React Imports */
-import React, { useState } from 'react';
+import React from 'react';
 import { useCookies } from "react-cookie";
 import { Link, useHistory } from "react-router-dom";
 

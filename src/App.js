@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react';
+import React from 'react';
 import { 
   BrowserRouter as Router,
   Switch,
@@ -7,14 +7,11 @@ import {
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import './App.css';
-// import Navbar   from './components/Navbar';
 
-import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, Logout, MemberArea, News, Resources, SignUp } from './components'
+import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, MemberArea, News, Resources, SignUp } from './components'
 
 
 function App() {
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-
     return (
     <div className="App">
       <CssBaseline />
@@ -30,7 +27,7 @@ function App() {
           <Route path="/ExecutiveArea"><ExecutiveArea /></Route>
           <Route path="/ContactUs">    <ContactUs /></Route>
           <Route path="/Login">        <Login /></Route>
-          <Route path="/Logout">       <Logout /></Route>
+          <Route path="/Signup">       <SignUp /></Route>
         </Switch>
       </Router>
     </div>
