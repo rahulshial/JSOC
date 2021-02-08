@@ -14,16 +14,17 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/AppBar';
+import Paper from '@material-ui/core/AppBar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: "center",
-    flexWrap: "wrap",
-    "& > *": {
-      margin: theme.spacing(0.5)
-    }
+    alignItems: 'center',
+    backgroundColor: 'green',
+    maxWidth: '100%',
+    maxHeight: '100%'
   },
   leftSide: {
     display: "flex",
@@ -35,28 +36,25 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     border: '2px solid',
   },
-
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  appBar: {
+  footBar: {
     top: 'auto',
     bottom: 0,
+    maxWidth: '100vw'
   },
+  body: {
+    display: 'flex',
+    flexDirection: 'row',
+  }
 }));
 
 export function Home() {
@@ -65,29 +63,27 @@ export function Home() {
   return (
     <div>
       <div className={classes.root}>
-        <div className={classes.leftSide}>
-          <div>
-            <h1> This is the presidents message</h1>
+        <div className={classes.body}>
+          <div className={classes.leftSide}>
+            <h1> presidents message</h1>
+          </div>
+          <div className={classes.rightSide}>
+            <div>
+              <h1> News box</h1>
+            </div>
+            <div>
+              <h1> Events box</h1>
+            </div>
           </div>
         </div>
-        <div className={classes.rightSide}>
-          <div>
-            <h1> this is the news box</h1>
-          </div>
-          <div>
-            <h1> this is the Events box</h1>
-          </div>
-        </div> 
-      </div>
-      <div>
-      <AppBar position="fixed" color="primary" className={classes.appBar}>
-        <Toolbar>
-        <Typography className={classes.text} variant="h5" gutterBottom>
-         Footer
-        </Typography>
-        </Toolbar>
-      </AppBar>
+
+        <div className={classes.footBar}>
+        <AppBar position="static" color="primary">
+          <h1> footer </h1>
+        </AppBar>
+        </div>
       </div>
     </div>
   )
 };
+
