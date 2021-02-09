@@ -97,8 +97,17 @@ export function Home() {
   },[]);
 
   const saveNewMessage = (event) => {
-    console.log(state.message);
-    
+    const messageText = {message: state.message}
+    console.log('In the post: ', messageText);
+
+    axios
+    .post('/news/presmessage', messageText)
+    .then(res => {
+      console.log('message updated');
+    })
+    .catch(err => {
+      console.log(err);
+    })
   };
 
   /** Render page */
