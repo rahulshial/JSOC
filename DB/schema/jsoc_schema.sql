@@ -25,8 +25,9 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- -----------------------------------------------------
 -- Table `news_announcements`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `news-announcements` (
+CREATE TABLE IF NOT EXISTS `news_announcements` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `type` TEXT NOT NULL,
   `message` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);

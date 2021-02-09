@@ -1,13 +1,13 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { useCookies } from "react-cookie";
-import useStyles from '../styles/Home';
 
+import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
@@ -23,12 +23,85 @@ const Copyright = () => {
   );
 };
 
+const useStyles = makeStyles((theme) => ({
+  form: {
+    '& > *': {
+      margin: theme.spacing(1),
+      width: '25ch',
+    },
+  },
+  gridBox: {
+    boxSizing: 'none',
+    display: 'grid',
+    gridTemplateColumns: '50% 50%',
+    width: '100%',
+    height: '100%',
+  },
+  flexBox: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  leftSide: {
+    border: '2px solid',
+  },
+  rightSide: {
+    display: "flex",
+    flexDirection: 'column',
+    justifyContent: "center",
+    border: '2px solid',
+  },
+  text: {
+    padding: theme.spacing(2, 2, 0),
+  },
+  paper: {
+    paddingBottom: 50,
+    elevation: 24,
+    margin: theme.spacing(2),
+    height: 'auto',
+  },
+  footBar: {
+    top: 'auto',
+    bottom: 0,
+  },
+}));
 
 export function Home() {
   const classes = useStyles();
 
   const [cookies] = useCookies(["name"]);
 
+  const [state, setState] = useState({
+    message:'',
+  });
+
+  const newMessageState = (event) => {
+    setState((prev) => ({
+      ...prev,
+      message: event.target.value,
+    }));
+  };
+
+  useEffect(() => {
+    axios
+    .get(`/news/presmessage`)
+    .then((row) => {
+      const message = row.data[0].message;
+      setState(prev => ({
+        ...prev,
+        message,
+      }))
+    })
+    .catch(error => {
+      console.log('Error fetching Presidents message: ', error)
+    });
+  },[]);
+
+  const saveNewMessage = (event) => {
+    console.log(state.message);
+    
+  };
+
+  /** Render page */
   if(Object.keys(cookies).length > 0 && 'userLogged' in cookies && cookies.userLogged.type === 'EC') {
     return (
       <div style={{height: '100%'}}>
@@ -40,15 +113,22 @@ export function Home() {
               </Typography>
             </Paper>
             <Paper variant="elevation" className={classes.paper}>
-              <TextareaAutosize
-                rowsMax={4}
-                aria-label="maximum height"
-                placeholder="Maximum 4 rows"
-                defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-                    ut labore et dolore magna aliqua."
+              <TextField
+                id="outlined-multiline-static"
+                placeholder={state.message}
+                value={state.message}
+                fullWidth
+                multiline
+                margin="normal"
+                rows={10}
+                InputLabelProps={{
+                  shrink: false
+                }}
+                variant="outlined"
+                onChange={newMessageState}
               />
               <br />
-            <Button variant="contained" color='primary'>Save</Button>
+            <Button variant="contained" color='primary'onClick={(event) => {saveNewMessage(event)}}>Save</Button>
             </Paper>
           </div>
           <div className={classes.rightSide}>
@@ -90,8 +170,7 @@ export function Home() {
               </Typography>
             </Paper>
             <Paper variant="elevation" className={classes.paper}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-        ut labore et dolore magna aliqua.
+            {state.message}
             </Paper>
           </div>
           <div className={classes.rightSide}>

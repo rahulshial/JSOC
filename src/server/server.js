@@ -11,7 +11,7 @@ const usersRoutes = require("./routes/users");
 const newsAnnouncementRoutes = require('./routes/newsAnnouncements.js');
 
 app.use("/users", usersRoutes);
-app.use("/news", usersRoutes);
+app.use("/news", newsAnnouncementRoutes);
 
 
 app.listen(port, () => {
