@@ -14,7 +14,7 @@ import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, MemberA
 function App() {
     return (
     <div className="App">
-      <CssBaseline />
+      {/* <CssBaseline /> */}
       <Router>
         <Navbar />
         <Switch>
