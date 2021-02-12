@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useCookies } from "react-cookie";
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 /** Material UI imports */
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
+// import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -90,13 +90,20 @@ export function Login() {
       .then((res) => {
         console.log(res);
         if (res.data.length > 0) {
-          const email = state.email;
-          const type = res.data[0].type;
-          setCookie("userLogged", { email, type }, { path: "/" });
-          history.push('/');
-          history.go(history.length - 1);
-          window.location.reload();
+          if (res.data === 'invalid password') {
+            setState((prev) => ({
+              ...prev,
+              loginError: true,
+            }));
+          } else {
+            const email = state.email;
+            const type = res.data[0].type;
+            setCookie("userLogged", { email, type }, { path: "/" });
+            history.push('/');
+            history.go(history.length - 1);
+            window.location.reload();
           }
+        }
         else {
           setState((prev) => ({
             ...prev,
@@ -107,10 +114,6 @@ export function Login() {
       .catch((error) => {
         console.log(error);
       });
-  };
-
-  const resetPassword = () => {
-    console.log('Password Reset Function');
   };
 
   return (
@@ -158,17 +161,14 @@ export function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2" onClick={resetPassword}>Forgot password?</Link>
+              <Link variant="body2" to="/PasswordReset">Forgot password?</Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
+              <Link variant="body2" to="/SignUp">Don't have an account? Sign Up</Link>
             </Grid>
           </Grid>
         </form>
-      </div>
-      
+      </div>      
       <Box mt={8}>
         <Copyright />
       </Box>
