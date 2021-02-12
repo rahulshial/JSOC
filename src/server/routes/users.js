@@ -1,6 +1,7 @@
 const express = require("express");
 const Router = express.Router();
 const sqlConnection = require('../lib/db');
+const bcrypt = require('bcrypt');
 
 /** Check user email and password */
 Router.get("/:email&:password", (req, res) => {
@@ -49,6 +50,7 @@ Router.get("/:email", (req, res) => {
 });
 
 Router.put("/:email&:password", (req, res) => {
-  
+  const password = bcrypt.hashSync(req.body.password, 10);
+
 });
 module.exports = Router;
