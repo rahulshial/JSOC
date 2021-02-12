@@ -64,6 +64,7 @@ export function SignUp() {
     password: '',
     passwordConfirmation: '',
     invalidPasswordError: false,
+    userExistsError: false,
   });
 
   const setEmail = (event) => {
@@ -93,45 +94,54 @@ export function SignUp() {
       console.log('Non matching passwords', state.password, state.passwordConfirmation);
       setState((prev) => ({
         ...prev,
-        loginError: true,
+        invalidPasswordError: true,
       }));
     } else {
       /** check if user exists with email address */
       axios
-      .get(`/users/${state.email}&${state.password}`)
+      .get(`/users/${state.email}`)
       .then((res) => {
         console.log(res);
         if (res.data.length > 0) {
-          const email = state.email;
-          const type = res.data[0].type;
-          setCookie("userLogged", { email, type }, { path: "/" });
-          history.push('/');
-          history.go(history.length - 1);
-          window.location.reload();
-          }
-        else {
           setState((prev) => ({
             ...prev,
-            loginError: true,
+            userExistsError: true,
           }));
+        }
+        else {
+          // setState((prev) => ({
+          //   ...prev,
+          //   userExistsError: true,
+          // }));
+          console.log('user does not exist...create it')
         }
       })
       .catch((error) => {
         console.log(error);
       });
     }
-  }
+  };
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {state.loginError? 
+        {state.invalidPasswordError? 
           <div className={classes.root}>
             <Chip
               className={classes.smallOverlay}
               icon={<FaceIcon />}
               label="Passwords do not match!"
+              color="secondary"
+            />
+          </div>
+          : <></>}
+          {state.userExistsError? 
+          <div className={classes.root}>
+            <Chip
+              className={classes.smallOverlay}
+              icon={<FaceIcon />}
+              label="User already exists, please login!"
               color="secondary"
             />
           </div>

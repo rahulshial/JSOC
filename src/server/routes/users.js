@@ -33,4 +33,22 @@ Router.get("/:email&:password", (req, res) => {
   });
 });
 
+Router.get("/:email", (req, res) => {
+  const email = req.params.email;
+  const queryString = `
+  SELECT id, password, type FROM users
+  WHERE email = '${email}';`;
+  sqlConnection.query(queryString, (err, row, fields) => {
+    if (err) {
+      res.send(err);
+      console.log("Error retrieving users data!!!");
+    } else {
+      res.send(row)
+    }
+  });
+});
+
+Router.put("/:email&:password", (req, res) => {
+  
+});
 module.exports = Router;
