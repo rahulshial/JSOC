@@ -109,11 +109,15 @@ export function SignUp() {
           }));
         }
         else {
-          // setState((prev) => ({
-          //   ...prev,
-          //   userExistsError: true,
-          // }));
           console.log('user does not exist...create it')
+          axios
+          .put(`/users/${state.email}&${state.password}`)
+          .then((res) => {
+            console.log('user added!!!');
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         }
       })
       .catch((error) => {
