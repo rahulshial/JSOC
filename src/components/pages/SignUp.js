@@ -111,9 +111,15 @@ export function SignUp() {
         else {
           console.log('user does not exist...create it')
           axios
-          .put(`/users/${state.email}&${state.password}`)
+          .post(`/users/${state.email}&${state.password}`)
           .then((res) => {
             console.log('user added!!!');
+            const email = state.email;
+            const type = res.data[0].type;
+            setCookie("userLogged", { email, type }, { path: "/" });
+            history.push('/');
+            history.go(history.length - 1);
+            window.location.reload();
           })
           .catch((error) => {
             console.log(error);
