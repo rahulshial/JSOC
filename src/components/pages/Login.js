@@ -65,10 +65,13 @@ export function Login() {
   const [state, setState] = useState({
     email:'',
     password: '',
+    passwordConfirmation: '',
     loginError: false,
     loginErrorLabel: '',
-    buttonText: 'Sign In',
+    mainButtonText: 'Sign In',
     functionState: 'signIn',
+    secondButtonText: 'Forgot Password?',
+    thirdButtonText: "Don't have an account? Sign Up",
   });
 
   const setEmail = (event) => {
@@ -85,14 +88,22 @@ export function Login() {
     }));
   };
 
-  const validateId = (event) => {
+  const setPasswordConfirmation = (event) => {
+    setState((prev) => ({
+      ...prev,
+      passwordConfirmation: event.target.value,
+    }));
+  };
+
+  const processEvent = (event) => {
     event.preventDefault();
     console.log(state.functionState);
     if(state.functionState === 'signIn') {
       console.log('Submitted');
       console.log(state.email);
+      const encodedPassword = encodeURIComponent(state.password);
       axios
-        .get(`/users/${state.email}&${state.password}`)
+        .get(`/users/${state.email}&${encodedPassword}`)
         .then((res) => {
           console.log(res);
           if (res.data.length > 0) {
@@ -160,14 +171,45 @@ export function Login() {
     };
   };
 
-  const passwordReset = (event) => {
+
+  const changeState = (event) => {
     event.preventDefault();
-    setState((prev) => ({
-      ...prev,
-      functionState: 'passwordReset',
-      buttonText: 'Send Password Reset Email',
-    }));
-  }
+    console.log(event.target.childNodes[0].parentElement.attributes[1].nodeValue);
+    const buttonClicked = event.target.childNodes[0].parentElement.attributes[1].nodeValue;
+    if(state.functionState === 'signIn' && buttonClicked === 'secondButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'passwordReset',
+        mainButtonText: 'Send Password Reset Email',
+        secondButtonText: 'Sign In',
+        thirdButtonText: "Don't have an account? Sign Up",
+      }));
+    } else if(state.functionState === 'passwordReset' && buttonClicked === 'secondButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'signIn',
+        mainButtonText: 'Sign In',
+        secondButtonText: 'Forgot Password?',
+        thirdButtonText: "Don't have an account? Sign Up",
+      }));  
+    } else if(buttonClicked === 'thirdButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'signUp',
+        mainButtonText: 'Create Account',
+        secondButtonText: 'Sign In?',
+        thirdButtonText: ''
+      }));
+    } else if(state.functionState === 'signUp' && buttonClicked === 'secondButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'signIn',
+        mainButtonText: 'Sign In',
+        secondButtonText: 'Forgot Password?',
+        thirdButtonText: "Don't have an account? Sign Up",
+      }));
+    };
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -194,32 +236,44 @@ export function Login() {
             autoComplete="email" 
             autoFocus 
             onChange={setEmail}/>
-          {state.functionState === 'signIn'?
-          <TextField 
-            variant="outlined" 
-            margin="normal" 
-            required fullWidth 
-            name="password"
-            label="Password" 
-            type="password" 
-            id="password" 
-            autoComplete="current-password"
-            onChange={setPassword}/>
-            : <></>}
+          {state.functionState === 'signIn'|| state.functionState === 'signUp'?
+            <TextField 
+              variant="outlined" 
+              margin="normal" 
+              required fullWidth 
+              name="password"
+              label="Password" 
+              type="password" 
+              id="password" 
+              autoComplete="current-password"
+              onChange={setPassword}/>
+              : <></>}
+          {state.functionState === 'signUp'?
+            <TextField 
+              variant="outlined" 
+              margin="normal" 
+              required fullWidth 
+              name="passwordConfirmation"
+              label="Password Confirmation" 
+              type="password" 
+              id="passwordConfirmation" 
+              autoComplete=""
+              onChange={setPasswordConfirmation}/>
+              : <></>}
           <Button 
             type="submit" 
             fullWidth variant="contained" 
             color="primary" 
             className={classes.submit}
-            onClick={(event) => {validateId(event)}}>
-            {state.buttonText}
+            onClick={(event) => {processEvent(event)}}>
+            {state.mainButtonText}
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link variant="body2" onClick={passwordReset}>Forgot password?</Link>
+              <Link id="secondButton" variant="body2" onClick={changeState}>{state.secondButtonText}</Link>
             </Grid>
             <Grid item>
-              <Link variant="body2" to="/SignUp">Don't have an account? Sign Up</Link>
+              <Link id="thirdButton" variant="body2" onClick={changeState}>{state.thirdButtonText}</Link>
             </Grid>
           </Grid>
         </form>

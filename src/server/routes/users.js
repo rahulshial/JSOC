@@ -11,7 +11,7 @@ let password = '';
 /** Check user email and password during login*/
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
-  password = req.params.password;
+  password = decodeURIComponent(req.params.password);
   console.log('Password from params: ', password);
   queryString = `
   SELECT id, password, type FROM users
@@ -95,14 +95,14 @@ Router.post('/password-reset/:email', (req, res) => {
           } else {
             /** send email */
             const transporter = nodemailer.createTransport({
-              service: 'gmail',
+              service: process.env.EMAIL_SERVICE,
               auth: {
-                user: 'donotreply.calgaryjains@gmail.com',
-                pass: process.env.GMAIL_PASSWORD
+                user: process.env.EMAIL_ACCOUNT,
+                pass: process.env.EMAIL_PASSWORD
               }
             });
             const message = {
-              from: 'donotreply.calgaryjains@gmail.com',
+              from: process.env.EMAIL_ACCOUNT,
               to: email,
               subject: 'Password Reset',
               html: '<h4><b>You requested a password reset</b></h4>' + token + '<br /><p>Jain Society Of Calgary</p>'
