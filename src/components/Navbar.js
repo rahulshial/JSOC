@@ -48,7 +48,9 @@ export function Navbar() {
 
   const logout = () => {
     removeCookie('userLogged');
-    history.go('0');
+    history.push('/');
+    history.go(history.length - 1);
+    window.location.reload();
   }
 
   let AuthButton, MemberArea, ExecutiveArea, LoggedInAs;

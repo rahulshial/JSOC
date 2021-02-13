@@ -99,13 +99,11 @@ export function Login() {
 
   const processEvent = (event) => {
     event.preventDefault();
-    console.log(state.functionState);
     if(state.functionState === 'signIn') {
       const encodedPassword = encodeURIComponent(state.password);
       axios
         .get(`/users/${state.email}&${encodedPassword}`)
         .then((res) => {
-          console.log(res);
           if (res.data.length > 0) {
             if (res.data === 'invalid password') {
               setState((prev) => ({
@@ -132,6 +130,11 @@ export function Login() {
         })
         .catch((error) => {
           console.log(error);
+          setState((prev) => ({
+            ...prev,
+            loginError: true,
+            loginErrorLabel: 'Server Error. Please try again later!!!',
+          }));
         });
     } else if(state.functionState === 'passwordReset') {
       axios
@@ -176,7 +179,6 @@ export function Login() {
       });
     } else if(state.functionState === 'signUp') {
       if (state.password !== state.passwordConfirmation) {
-        console.log('Non matching passwords', state.password, state.passwordConfirmation);
         setState((prev) => ({
           ...prev,
           loginError: true,
@@ -187,7 +189,6 @@ export function Login() {
         axios
         .get(`/users/${state.email}`)
         .then((res) => {
-          console.log(res);
           if (res.data.length > 0) {
             setState((prev) => ({
               ...prev,
@@ -208,11 +209,21 @@ export function Login() {
             })
             .catch((error) => {
               console.log(error);
+              setState((prev) => ({
+                ...prev,
+                loginError: true,
+                loginErrorLabel: 'Server Error. Please try again later!!!',
+              }));
             });
           }
         })
         .catch((error) => {
           console.log(error);
+          setState((prev) => ({
+            ...prev,
+            loginError: true,
+            loginErrorLabel: 'Server Error. Please try again later!!!',
+          }));
         });
       };
     };
@@ -220,7 +231,6 @@ export function Login() {
 
   const changeState = (event) => {
     event.preventDefault();
-    console.log(event.target.childNodes[0].parentElement.attributes[1].nodeValue);
     const buttonClicked = event.target.childNodes[0].parentElement.attributes[1].nodeValue;
     if(state.functionState === 'signIn' && buttonClicked === 'secondButton') {
       setState((prev) => ({
