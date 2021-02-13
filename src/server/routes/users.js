@@ -2,7 +2,7 @@ const express = require("express");
 const Router = express.Router();
 const sqlConnection = require('../lib/db');
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const { generateRandomString } = require('../helpers/helperFunctions');
 
 let queryString = '';
@@ -12,7 +12,7 @@ let password = '';
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
   password = req.params.password;
-
+  console.log(password);
   queryString = `
   SELECT id, password, type FROM users
   WHERE email = '${email}';`;
@@ -32,7 +32,6 @@ Router.get("/:email&:password", (req, res) => {
     };
   });
 });
-
 
 /** check if user exists during signup*/
 Router.get("/:email", (req, res) => {
@@ -83,10 +82,9 @@ Router.post('/password-reset/:email', (req, res) => {
       if(row.length === 0) {
         res.send('invalid user');
       } else {
-        // const token = crypto.randomBytes(4).toString('hex')//creating the token to be sent to the forgot password form (react)
         const token = generateRandomString();
-        const newPassword = bcrypt.hashSync(token, 10) //hashing the password to store in the db node.js
-        console.log(token, newPassword);
+        const newPassword = bcrypt.hashSync(token, 10)
+        console.log(token);
         /**update database with new password */
         queryString = `
         UPDATE users SET password='${newPassword}'
@@ -95,7 +93,29 @@ Router.post('/password-reset/:email', (req, res) => {
           if(err) {
             console.log('Error updating user password!!');
             res.send(err);
-          } else {}
+          } else {
+            /** send email */
+            const transporter = nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                user: 'donotreply.calgaryjains@gmail.com',
+                pass: process.env.GMAIL_PASSWORD
+              }
+            });
+            const message = {
+              from: 'donotreply.calgaryjains@gmail.com',
+              to: email,
+              subject: 'Password Reset',
+              html: '<h4><b>You requested a password reset</b></h4>' + token + '<br /><p>Jain Society Of Calgary</p>'
+            };
+            transporter.sendMail(message, function(err, info) {
+              if (err) {
+                res.send('error')
+              } else {
+                res.send('reset email sent');
+              };
+          });            
+          }
         });
       };
     };
