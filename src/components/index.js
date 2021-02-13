@@ -9,5 +9,6 @@ export { MemberArea } from './pages/MemberArea';
 export { News } from './pages/News';
 export { Resources } from './pages/Resources';
 export { DirectorySearch } from './pages/memberAreaPages/DirectorySearch';
+export { PersonalInfo } from './pages/memberAreaPages/PersonalInfo';
 export { ChangePassword } from './pages/memberAreaPages/ChangePassword';
 export { MemberNavBar } from './pages/memberAreaPages/MemberNavBar';

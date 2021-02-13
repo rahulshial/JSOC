@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { useCookies } from 'react-cookie';
 
-import { MemberNavBar, ChangePassword, DirectorySearch } from '../'
+import { MemberNavBar, ChangePassword, PersonalInfo, DirectorySearch } from '../'
 
 export function MemberArea() {
 
@@ -24,11 +24,7 @@ export function MemberArea() {
       );
     } else if (state.shownTab === 1) {
       return (
-        <div>
-          <h1>This is the Member Area Page</h1>
-          <h1>Check your own Data</h1>
-          <h1>Search for other members based on state, city, native place, industry, etc </h1>    
-        </div>
+        <PersonalInfo />
       );
     } else if(state.shownTab === 2) {
       <DirectorySearch />
