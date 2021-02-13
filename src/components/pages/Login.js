@@ -72,6 +72,8 @@ export function Login() {
     functionState: 'signIn',
     secondButtonText: 'Forgot Password?',
     thirdButtonText: "Don't have an account? Sign Up",
+    invalidPasswordError: false,
+    userExistsError: false,
   });
 
   const setEmail = (event) => {
@@ -99,8 +101,6 @@ export function Login() {
     event.preventDefault();
     console.log(state.functionState);
     if(state.functionState === 'signIn') {
-      console.log('Submitted');
-      console.log(state.email);
       const encodedPassword = encodeURIComponent(state.password);
       axios
         .get(`/users/${state.email}&${encodedPassword}`)
@@ -149,6 +149,10 @@ export function Login() {
               ...prev,
               loginError: true,
               loginErrorLabel: 'Please check your email for password reset email!',
+              functionState: 'signIn',
+              mainButtonText: 'Sign In',
+              secondButtonText: 'Forgot Password?',
+              thirdButtonText: "Don't have an account? Sign Up",
             }));
           } else {
             setState((prev) => ({
@@ -156,18 +160,61 @@ export function Login() {
               loginError: true,
               loginErrorLabel: 'Error sending email, please try again later!',
               functionState: 'signIn',
+              mainButtonText: 'Sign In',
+              secondButtonText: 'Forgot Password?',
+              thirdButtonText: "Don't have an account? Sign Up",
             }));
           }
         }
       })
       .catch((error) => {
-        // console.log('User Not Found');
         setState((prev) => ({
           ...prev,
           loginError: true,
           loginErrorLabel: 'Error Retrieving Data, please try again later!',
         }));
       });
+    } else if(state.functionState === 'signUp') {
+      if (state.password !== state.passwordConfirmation) {
+        console.log('Non matching passwords', state.password, state.passwordConfirmation);
+        setState((prev) => ({
+          ...prev,
+          loginError: true,
+          loginErrorLabel: 'Passwords do not match!',
+        }));
+      } else {
+        /** check if user exists with email address */
+        axios
+        .get(`/users/${state.email}`)
+        .then((res) => {
+          console.log(res);
+          if (res.data.length > 0) {
+            setState((prev) => ({
+              ...prev,
+              loginError: true,
+              loginErrorLabel: 'User already exists, please Sign In!',
+            }));
+          }
+          else {
+            axios
+            .post(`/users/${state.email}&${state.password}`)
+            .then((res) => {
+               const email = state.email;
+              const type = res.data[0].type;
+              setCookie("userLogged", { email, type }, { path: "/" });
+              history.push('/');
+              history.go(history.length - 1);
+              window.location.reload();
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      };
     };
   };
 
