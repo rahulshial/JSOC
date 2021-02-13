@@ -12,7 +12,7 @@ let password = '';
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
   password = req.params.password;
-  console.log(password);
+  console.log('Password from params: ', password);
   queryString = `
   SELECT id, password, type FROM users
   WHERE email = '${email}';`;
@@ -78,13 +78,12 @@ Router.post('/password-reset/:email', (req, res) => {
     if(err) {
       res.send(err);
     } else {
-      console.log(row.length);
       if(row.length === 0) {
         res.send('invalid user');
       } else {
         const token = generateRandomString();
         const newPassword = bcrypt.hashSync(token, 10)
-        console.log(token);
+        console.log("New Token Generated: ", token);
         /**update database with new password */
         queryString = `
         UPDATE users SET password='${newPassword}'
