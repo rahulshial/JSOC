@@ -51,15 +51,16 @@ export function Navbar() {
     history.go('0');
   }
 
-  let AuthButton, MemberArea, ExecutiveArea;
+  let AuthButton, MemberArea, ExecutiveArea, LoggedInAs;
   if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+    LoggedInAs = <span className="item-nav">You're logged in as {cookies.userLogged.email}</span>
     console.log(cookies);
     if(cookies.userLogged.type === 'EC') {
       ExecutiveArea = <Link className="item-nav" to="/ExecutiveArea">ExecutiveArea</Link>;
     } else if(cookies.userLogged.type === 'MEM') {
       MemberArea = <Link className="item-nav" to="/MemberArea">MemberArea</Link>;
     };    
-    AuthButton = <span className="item-nav" onClick={(event) => {logout(event)}}>Logout</span>;
+    AuthButton = <Link className="item-nav" onClick={(event) => {logout(event)}}>Logout</Link>;
   } else {
     AuthButton = <Link className="item-nav" to="/Login">     Login</Link>;
   };
@@ -81,6 +82,7 @@ export function Navbar() {
           {MemberArea}
           {ExecutiveArea}
           {AuthButton}
+          {LoggedInAs}
         </Toolbar>
       </AppBar>
     </div>

@@ -218,7 +218,6 @@ export function Login() {
     };
   };
 
-
   const changeState = (event) => {
     event.preventDefault();
     console.log(event.target.childNodes[0].parentElement.attributes[1].nodeValue);
