@@ -7,7 +7,7 @@ import {
 
 import './App.css';
 
-import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, MemberArea, News, Resources, SignUp, PasswordReset } from './components'
+import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, MemberArea, News, Resources } from './components'
 
 
 function App() {
@@ -26,8 +26,6 @@ function App() {
           <Route path="/ExecutiveArea"><ExecutiveArea /></Route>
           <Route path="/ContactUs">    <ContactUs /></Route>
           <Route path="/Login">        <Login /></Route>
-          <Route path="/Signup">       <SignUp /></Route>
-          <Route path="/PasswordReset"> <PasswordReset /></Route>
         </Switch>
       </Router>
     </div>

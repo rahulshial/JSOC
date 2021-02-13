@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export function SignUp() {
+export function DirectorySearch() {
   const classes = useStyles();
   const [cookies, setCookie] = useCookies(["name"]);
   const history = useHistory();

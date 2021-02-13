@@ -1,9 +1,9 @@
 import React from 'react'
 
-export function PasswordReset() {
+export function ChangePassword() {
   return (
     <div>
-      Password Reset Page
+      Password Change Page
     </div>
   )
 };

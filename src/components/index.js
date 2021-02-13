@@ -8,5 +8,6 @@ export { Login } from './pages/Login';
 export { MemberArea } from './pages/MemberArea';
 export { News } from './pages/News';
 export { Resources } from './pages/Resources';
-export { SignUp } from './pages/SignUp';
-export { PasswordReset } from './pages/PasswordReset';
+export { DirectorySearch } from './pages/memberAreaPages/DirectorySearch';
+export { ChangePassword } from './pages/memberAreaPages/ChangePassword';
+export { MemberNavBar } from './pages/memberAreaPages/MemberNavBar';
