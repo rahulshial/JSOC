@@ -66,7 +66,11 @@ export function Login() {
     email:'',
     password: '',
     loginError: false,
+    loginErrorLabel: '',
+    buttonText: 'Sign In',
+    functionState: 'signIn',
   });
+
   const setEmail = (event) => {
     setState((prev) => ({
       ...prev,
@@ -83,38 +87,87 @@ export function Login() {
 
   const validateId = (event) => {
     event.preventDefault();
-    console.log('Submitted');
-    console.log(state.email);
-    axios
-      .get(`/users/${state.email}&${state.password}`)
-      .then((res) => {
-        console.log(res);
-        if (res.data.length > 0) {
-          if (res.data === 'invalid password') {
+
+    if(state.functionState === 'login') {
+      console.log('Submitted');
+      console.log(state.email);
+      axios
+        .get(`/users/${state.email}&${state.password}`)
+        .then((res) => {
+          console.log(res);
+          if (res.data.length > 0) {
+            if (res.data === 'invalid password') {
+              setState((prev) => ({
+                ...prev,
+                loginError: true,
+                loginErrorLabel: 'Email / Password combination does not exist',
+              }));
+            } else {
+              const email = state.email;
+              const type = res.data[0].type;
+              setCookie("userLogged", { email, type }, { path: "/" });
+              history.push('/');
+              history.go(history.length - 1);
+              window.location.reload();
+            }
+          }
+          else {
             setState((prev) => ({
               ...prev,
               loginError: true,
+              loginErrorLabel: 'Email / Password combination does not exist',
+            }));
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if(state.functionState === 'passwordReset') {
+      axios
+      .post(`/users/password-reset/${state.email}`)
+      .then((res) => {
+        if (res.data.length > 0) {
+          if (res.data === 'invalid user') {
+            setState((prev) => ({
+              ...prev,
+              loginError: true,
+              loginErrorLabel: 'User email not found!',
+            }));
+          } else if (res.data === 'reset email sent') {
+            setState((prev) => ({
+              ...prev,
+              loginError: true,
+              loginErrorLabel: 'Please check your email for password reset email!',
             }));
           } else {
-            const email = state.email;
-            const type = res.data[0].type;
-            setCookie("userLogged", { email, type }, { path: "/" });
-            history.push('/');
-            history.go(history.length - 1);
-            window.location.reload();
+            setState((prev) => ({
+              ...prev,
+              loginError: true,
+              loginErrorLabel: 'Error sending email, please try again later!',
+              functionState: 'signIn',
+            }));
           }
-        }
-        else {
-          setState((prev) => ({
-            ...prev,
-            loginError: true,
-          }));
         }
       })
       .catch((error) => {
-        console.log(error);
+        // console.log('User Not Found');
+        setState((prev) => ({
+          ...prev,
+          loginError: true,
+          loginErrorLabel: 'Error Retrieving Data, please try again later!',
+        }));
       });
+    };
   };
+
+  const passwordReset = (event) => {
+    event.preventDefault();
+    setState((prev) => ({
+      ...prev,
+      functionState: 'passwordReset',
+      buttonText: 'Send Password Reset Email',
+    }));
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -125,7 +178,7 @@ export function Login() {
             <Chip
               className={classes.smallOverlay}
               icon={<FaceIcon />}
-              label="Email / Password combination does not exist"
+              label={state.loginErrorLabel}
               color="secondary"
             />
           </div>
@@ -141,6 +194,7 @@ export function Login() {
             autoComplete="email" 
             autoFocus 
             onChange={setEmail}/>
+          {state.functionState === 'signIn'?
           <TextField 
             variant="outlined" 
             margin="normal" 
@@ -151,17 +205,18 @@ export function Login() {
             id="password" 
             autoComplete="current-password"
             onChange={setPassword}/>
+            : <></>}
           <Button 
             type="submit" 
             fullWidth variant="contained" 
             color="primary" 
             className={classes.submit}
             onClick={(event) => {validateId(event)}}>
-            Sign In
+            {state.buttonText}
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link variant="body2" to="/PasswordReset">Forgot password?</Link>
+              <Link variant="body2" onClick={passwordReset}>Forgot password?</Link>
             </Grid>
             <Grid item>
               <Link variant="body2" to="/SignUp">Don't have an account? Sign Up</Link>
