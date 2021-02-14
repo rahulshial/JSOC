@@ -114,7 +114,7 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
         helperFunction.updatePassword(id, newPassword)
         .then((rows) => {
           if(rows.affectedRows === 1) {
-            res.send('Success');
+            res.send('success');
           }
         })
         .catch((error) => {
