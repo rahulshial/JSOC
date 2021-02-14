@@ -104,7 +104,6 @@ export function Login() {
       axios
         .get(`/users/${state.email}&${encodedPassword}`)
         .then((res) => {
-          // console.log("Signin: data length: ",res.data.length)
           if (res.data.length > 0) {
             if(res.data === 'server error') {
               setState((prev) => ({
@@ -178,6 +177,7 @@ export function Login() {
         }));
       });
     } else if(state.functionState === 'signUp') {
+      console.log('In signup')
       if (state.password !== state.passwordConfirmation) {
         setState((prev) => ({
           ...prev,
@@ -185,15 +185,28 @@ export function Login() {
           loginErrorLabel: 'Passwords do not match!',
         }));
       } else {
+        console.log('before axios post..')
         axios
         .post(`/users/${state.email}&${state.password}`)
         .then((res) => {
-            const email = state.email;
-          const type = res.data[0].type;
-          setCookie("userLogged", { email, type }, { path: "/" });
-          history.push('/');
-          history.go(history.length - 1);
-          window.location.reload();
+          console.log('from axios post', res.length)
+          if(res.data.length > 0) {
+            if(res.data === "user exists") {
+              console.log('setting login error state...user exists')
+              setState((prev) => ({
+                ...prev,
+                loginError: true,
+                loginErrorLabel: 'User Exists. Consider Sign In!!!',
+              }));  
+            } else if (res.data === 'success') {
+              const email = state.email;
+              const type = 'MEM';
+              setCookie("userLogged", { email, type }, { path: "/" });
+              history.push('/');
+              history.go(history.length - 1);
+              window.location.reload();    
+            }
+          }
         })
         .catch((error) => {
           console.log(error);

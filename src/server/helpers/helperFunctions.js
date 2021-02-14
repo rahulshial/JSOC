@@ -40,12 +40,10 @@ const getUserByEmail = (email) => {
 const addNewUser = (email, password, type) => {
   initQueryVars(queryString, queryParams);
   queryParams = [email, password, type];
-  queryString = `
-  INSERT INTO users (email, password, type)
-  VALUES (?, ?, ?);`;
+  queryString = `INSERT INTO users (email, password, type) VALUES (?, ?, ?);`;
 
   return new Promise(function(resolve, reject) {
-    return sqlConnection.query(queryString, (error, rows, fields) => {
+    return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
       if(error) {
         return reject(error)
       }

@@ -40,17 +40,24 @@ Router.post("/:email&:password", (req, res) => {
   email = req.params.email;
   const type = 'MEM';
   helperFunction.getUserByEmail(email)
-  .then((row) => {
-    if(row.length === 0) {
+  .then((rows) => {
+    if(rows.length === 0) {
       helperFunction.addNewUser(email, password, type)
       .then((rows) => {
-        console.log(rows);
+        console.log(rows.insertId);
+        if(rows.insertId) {
+          console.log('success')
+          res.send('success');
+        }
       })
       .catch((error) => {
         console.log(error);
         res.send('server error');
       })  
-    }
+    } else {
+      console.log('user exists')
+      res.send('user exists');
+    };
   })
   .catch((error) => {
     console.log(error);
