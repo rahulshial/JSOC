@@ -2,7 +2,7 @@ const express = require("express");
 const Router = express.Router();
 const sqlConnection = require('../lib/db');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
+
 // const { generateRandomString, getUserByEmail } = require('../helpers/helperFunctions');
 const helperFunction = require('../helpers/helperFunctions');
 
@@ -67,54 +67,38 @@ Router.post("/:email&:password", (req, res) => {
 
 Router.post('/password-reset/:email', (req, res) => {
   email = req.params.email;
-  /** check if user exists */
-  queryString = `
-  SELECT id FROM users
-  WHERE email = '${email}';`;
-  sqlConnection.query(queryString, (err, row, fields) => {
-    if(err) {
-      res.send(err);
+  helperFunction.getUserByEmail(email)
+  .then((rows) => {
+    if(rows.length === 0) {
+      res.send('invalid user');
     } else {
-      if(row.length === 0) {
-        res.send('invalid user');
-      } else {
-        const token = helperFunction.generateRandomString();
-        const newPassword = bcrypt.hashSync(token, 10)
-        console.log("New Token Generated: ", token);
-        /**update database with new password */
-        queryString = `
-        UPDATE users SET password='${newPassword}'
-        WHERE email = '${email}';`;
-        sqlConnection.query(queryString, (err, row, fields) => {
-          if(err) {
-            console.log('Error updating user password!!');
-            res.send(err);
-          } else {
-            /** send email */
-            const transporter = nodemailer.createTransport({
-              service: process.env.EMAIL_SERVICE,
-              auth: {
-                user: process.env.EMAIL_ACCOUNT,
-                pass: process.env.EMAIL_PASSWORD
-              }
-            });
-            const message = {
-              from: process.env.EMAIL_ACCOUNT,
-              to: email,
-              subject: 'Password Reset',
-              html: '<h4><b>You requested a password reset</b></h4>' + token + '<br /><p>Jain Society Of Calgary</p>'
-            };
-            transporter.sendMail(message, function(err, info) {
-              if (err) {
-                res.send('error')
-              } else {
-                res.send('reset email sent');
-              };
-          });            
-          }
-        });
-      };
-    };
+      const id = rows[0].id;
+      const token = helperFunction.generateRandomString()
+      const newPassword = bcrypt.hashSync(token, 10);
+      console.log(newPassword);
+      helperFunction.updatePassword(id, newPassword)
+      .then((rows) => {
+        console.log(rows.affectedRows);
+        if(rows.affectedRows === 1) {
+          helperFunction.sendPasswordResetEmail(email, token)
+          .then((info) => {
+            res.send('success')
+          })
+          .catch((error) => {
+            console.log(error);
+            res.send('email error');
+          });  
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.send('server error');
+      });    
+    }
+  })
+  .catch((error) => {
+    console.log(error);
+    res.send('server error');
   });
 });
 

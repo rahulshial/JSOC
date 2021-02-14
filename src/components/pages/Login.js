@@ -97,126 +97,134 @@ export function Login() {
     }));
   };
 
-  const processEvent = (event) => {
-    event.preventDefault();
-    if(state.functionState === 'signIn') {
-      const encodedPassword = encodeURIComponent(state.password);
-      axios
-        .get(`/users/${state.email}&${encodedPassword}`)
-        .then((res) => {
-          if (res.data.length > 0) {
-            if(res.data === 'server error') {
-              setState((prev) => ({
-                ...prev,
-                loginError: true,
-                loginErrorLabel: 'Server Error. Please try again later!!!',
-              }));
-            } else if (res.data === 'invalid user') {
-              setState((prev) => ({
-                ...prev,
-                loginError: true,
-                loginErrorLabel: 'Email / Password combination does not exist',
-              }));
-            } else {
-              const email = state.email;
-              const type = res.data[0].type;
-              setCookie("userLogged", { email, type }, { path: "/" });
-              history.push('/');
-              history.go(history.length - 1);
-              window.location.reload();
-            }
-          };
-        })
-        .catch((error) => {
-          console.log(error);
+  const signInProcess = () => {
+    const encodedPassword = encodeURIComponent(state.password);
+    axios
+      .get(`/users/${state.email}&${encodedPassword}`)
+      .then((res) => {
+        if (res.data.length > 0) {
+          if(res.data === 'server error') {
+            setState((prev) => ({
+              ...prev,
+              loginError: true,
+              loginErrorLabel: 'Server Error. Please try again later!!!',
+            }));
+          } else if (res.data === 'invalid user') {
+            setState((prev) => ({
+              ...prev,
+              loginError: true,
+              loginErrorLabel: 'Email / Password combination does not exist',
+            }));
+          } else {
+            const email = state.email;
+            const type = res.data[0].type;
+            setCookie("userLogged", { email, type }, { path: "/" });
+            history.push('/');
+            history.go(history.length - 1);
+            window.location.reload();
+          }
+        };
+      })
+      .catch((error) => {
+        console.log(error);
+        setState((prev) => ({
+          ...prev,
+          loginError: true,
+          loginErrorLabel: 'Server Error. Please try again later!!!',
+        }));
+      });
+  };
+
+  const passwordResetProcess = () => {
+    axios
+    .post(`/users/password-reset/${state.email}`)
+    .then((res) => {
+      if (res.data.length > 0) {
+        if (res.data === 'invalid user') {
           setState((prev) => ({
             ...prev,
             loginError: true,
-            loginErrorLabel: 'Server Error. Please try again later!!!',
+            loginErrorLabel: 'User email not found!',
           }));
-        });
-    } else if(state.functionState === 'passwordReset') {
+        } else if (res.data === 'success') {
+          setState((prev) => ({
+            ...prev,
+            loginError: true,
+            loginErrorLabel: 'Please check your email for password reset email!',
+            functionState: 'signIn',
+            mainButtonText: 'Sign In',
+            secondButtonText: 'Forgot Password?',
+            thirdButtonText: "Don't have an account? Sign Up",
+          }));
+        } else {
+          setState((prev) => ({
+            ...prev,
+            loginError: true,
+            loginErrorLabel: 'Error sending email, please try again later!',
+            functionState: 'signIn',
+            mainButtonText: 'Sign In',
+            secondButtonText: 'Forgot Password?',
+            thirdButtonText: "Don't have an account? Sign Up",
+          }));
+        }
+      }
+    })
+    .catch((error) => {
+      setState((prev) => ({
+        ...prev,
+        loginError: true,
+        loginErrorLabel: 'Error Retrieving Data, please try again later!',
+      }));
+    });
+  };
+
+  const signUpProcess = () => {
+    if (state.password !== state.passwordConfirmation) {
+      setState((prev) => ({
+        ...prev,
+        loginError: true,
+        loginErrorLabel: 'Passwords do not match!',
+      }));
+    } else {
       axios
-      .post(`/users/password-reset/${state.email}`)
+      .post(`/users/${state.email}&${state.password}`)
       .then((res) => {
-        if (res.data.length > 0) {
-          if (res.data === 'invalid user') {
+        if(res.data.length > 0) {
+          if(res.data === "user exists") {
             setState((prev) => ({
               ...prev,
               loginError: true,
-              loginErrorLabel: 'User email not found!',
-            }));
-          } else if (res.data === 'reset email sent') {
-            setState((prev) => ({
-              ...prev,
-              loginError: true,
-              loginErrorLabel: 'Please check your email for password reset email!',
-              functionState: 'signIn',
-              mainButtonText: 'Sign In',
-              secondButtonText: 'Forgot Password?',
-              thirdButtonText: "Don't have an account? Sign Up",
-            }));
-          } else {
-            setState((prev) => ({
-              ...prev,
-              loginError: true,
-              loginErrorLabel: 'Error sending email, please try again later!',
-              functionState: 'signIn',
-              mainButtonText: 'Sign In',
-              secondButtonText: 'Forgot Password?',
-              thirdButtonText: "Don't have an account? Sign Up",
-            }));
+              loginErrorLabel: 'User Exists. Consider Sign In!!!',
+            }));  
+          } else if (res.data === 'success') {
+            const email = state.email;
+            const type = 'MEM';
+            setCookie("userLogged", { email, type }, { path: "/" });
+            history.push('/');
+            history.go(history.length - 1);
+            window.location.reload();    
           }
         }
       })
       .catch((error) => {
+        console.log(error);
         setState((prev) => ({
           ...prev,
           loginError: true,
-          loginErrorLabel: 'Error Retrieving Data, please try again later!',
+          loginErrorLabel: 'Server Error. Please try again later!!!',
         }));
       });
+    }
+  };
+
+  const processEvent = (event) => {
+    event.preventDefault();
+    if(state.functionState === 'signIn') {
+      signInProcess();
+    } else if(state.functionState === 'passwordReset') {
+      passwordResetProcess();
     } else if(state.functionState === 'signUp') {
-      console.log('In signup')
-      if (state.password !== state.passwordConfirmation) {
-        setState((prev) => ({
-          ...prev,
-          loginError: true,
-          loginErrorLabel: 'Passwords do not match!',
-        }));
-      } else {
-        console.log('before axios post..')
-        axios
-        .post(`/users/${state.email}&${state.password}`)
-        .then((res) => {
-          console.log('from axios post', res.length)
-          if(res.data.length > 0) {
-            if(res.data === "user exists") {
-              console.log('setting login error state...user exists')
-              setState((prev) => ({
-                ...prev,
-                loginError: true,
-                loginErrorLabel: 'User Exists. Consider Sign In!!!',
-              }));  
-            } else if (res.data === 'success') {
-              const email = state.email;
-              const type = 'MEM';
-              setCookie("userLogged", { email, type }, { path: "/" });
-              history.push('/');
-              history.go(history.length - 1);
-              window.location.reload();    
-            }
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          setState((prev) => ({
-            ...prev,
-            loginError: true,
-            loginErrorLabel: 'Server Error. Please try again later!!!',
-          }));
-        });
-      }
+      signUpProcess();
     }
   };
 
