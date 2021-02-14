@@ -104,8 +104,15 @@ export function Login() {
       axios
         .get(`/users/${state.email}&${encodedPassword}`)
         .then((res) => {
+          // console.log("Signin: data length: ",res.data.length)
           if (res.data.length > 0) {
-            if (res.data === 'invalid password') {
+            if(res.data === 'server error') {
+              setState((prev) => ({
+                ...prev,
+                loginError: true,
+                loginErrorLabel: 'Server Error. Please try again later!!!',
+              }));
+            } else if (res.data === 'invalid user') {
               setState((prev) => ({
                 ...prev,
                 loginError: true,
@@ -119,14 +126,7 @@ export function Login() {
               history.go(history.length - 1);
               window.location.reload();
             }
-          }
-          else {
-            setState((prev) => ({
-              ...prev,
-              loginError: true,
-              loginErrorLabel: 'Email / Password combination does not exist',
-            }));
-          }
+          };
         })
         .catch((error) => {
           console.log(error);
@@ -185,37 +185,15 @@ export function Login() {
           loginErrorLabel: 'Passwords do not match!',
         }));
       } else {
-        /** check if user exists with email address */
         axios
-        .get(`/users/${state.email}`)
+        .post(`/users/${state.email}&${state.password}`)
         .then((res) => {
-          if (res.data.length > 0) {
-            setState((prev) => ({
-              ...prev,
-              loginError: true,
-              loginErrorLabel: 'User already exists, please Sign In!',
-            }));
-          }
-          else {
-            axios
-            .post(`/users/${state.email}&${state.password}`)
-            .then((res) => {
-               const email = state.email;
-              const type = res.data[0].type;
-              setCookie("userLogged", { email, type }, { path: "/" });
-              history.push('/');
-              history.go(history.length - 1);
-              window.location.reload();
-            })
-            .catch((error) => {
-              console.log(error);
-              setState((prev) => ({
-                ...prev,
-                loginError: true,
-                loginErrorLabel: 'Server Error. Please try again later!!!',
-              }));
-            });
-          }
+            const email = state.email;
+          const type = res.data[0].type;
+          setCookie("userLogged", { email, type }, { path: "/" });
+          history.push('/');
+          history.go(history.length - 1);
+          window.location.reload();
         })
         .catch((error) => {
           console.log(error);
@@ -225,8 +203,8 @@ export function Login() {
             loginErrorLabel: 'Server Error. Please try again later!!!',
           }));
         });
-      };
-    };
+      }
+    }
   };
 
   const changeState = (event) => {
