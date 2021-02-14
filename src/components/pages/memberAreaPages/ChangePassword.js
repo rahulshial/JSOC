@@ -69,13 +69,6 @@ export function ChangePassword() {
     errorBarColor: 'secondary'
   });
 
-  const setEmail = (event) => {
-    setState((prev) => ({
-      ...prev,
-      email: event.target.value,
-    }));
-  };
-
   const setCurrPassword = (event) => {
     setState((prev) => ({
       ...prev,
@@ -98,15 +91,15 @@ export function ChangePassword() {
   };
 
   const changePassword = (event) => {
-    event.preventDefault();
-    
+    event.preventDefault(); 
     if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
       console.log(cookies.userLogged.email);
       setState((prev) => ({
         ...prev,
         email: cookies.userLogged.email,
       }));
-      if (state.password !== state.passwordConfirmation) {
+      console.log(state);
+      if (state.newPassword !== state.newPasswordConfirmation) {
         setState((prev) => ({
           ...prev,
           errors: true,
@@ -117,8 +110,9 @@ export function ChangePassword() {
         const currPassword = encodeURIComponent(state.currPassword);
         const newPassword = encodeURIComponent(state.newPassword);
         axios
-        .patch(`/users/changePassword/${state.email}&${currPassword}&${newPassword}`)
+        .post(`/users/changePassword/${cookies.userLogged.email}&${currPassword}&${newPassword}`)
         .then((res) => {
+          console.log('change password res on update',res);
           let errorMessage = '';
           let errorBarColor = 'secondary'
           if (res.data.length > 0) {
@@ -132,13 +126,19 @@ export function ChangePassword() {
               case 'server error':
                 errorMessage = 'Server error. Please try again later!';
                 break;
-              default:
+              case 'success':
                 errorMessage = 'Password Change Success!';
                 errorBarColor = 'primary';
                 break;
-              }
+              default:
+                errorMessage = 'Unknown Error!';
+                break;
+              };
             setState((prev) => ({
               ...prev,
+              currPassword: '',
+              newPassword: '',
+              newPasswordConfirmation: '',
               errors: true,
               errorText: errorMessage,
               errorBarColor: errorBarColor,
@@ -156,7 +156,7 @@ export function ChangePassword() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {state.invalidPasswordError? 
+        {state.errors? 
           <div className={classes.root}>
             <Chip
               className={classes.smallOverlay}
@@ -175,6 +175,7 @@ export function ChangePassword() {
             label="Current Password" 
             type="password" 
             id="currPassword"
+            value={state.currPassword}
             autoFocus 
             onChange={setCurrPassword}/>
           <TextField 
@@ -185,6 +186,7 @@ export function ChangePassword() {
             label="New Password" 
             type="password" 
             id="newPassword"
+            value={state.newPassword}
             onChange={setNewPassword}/>
           <TextField 
             variant="outlined" 
@@ -194,7 +196,7 @@ export function ChangePassword() {
             label="New Password Confirmation" 
             type="password"
             id="newPasswordConfirmation"
-            autoComplete=""
+            value={state.newPasswordConfirmation}
             onChange={setNewPasswordConfirmation}/>
           <Button 
             type="submit" 

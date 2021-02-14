@@ -55,6 +55,7 @@ Router.get("/:email", (req, res) => {
 Router.post("/:email&:password", (req, res) => {
   password = bcrypt.hashSync(req.params.password, 10);
   email = req.params.email;
+  console.log(password);
   queryString = `
   INSERT INTO users (email, password, type)
   VALUES ('${email}','${password}','MEM');`;
@@ -122,12 +123,13 @@ Router.post('/password-reset/:email', (req, res) => {
   });
 });
 
-Router.patch('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
+Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
   console.log('in patch...')
   const currPassword = decodeURIComponent(req.params.currPassword);
-  const newPassword = decodeURIComponent(req.params.newPassword);
+  const tempPassword = decodeURIComponent(req.params.newPassword);
+  const newPassword = bcrypt.hashSync(tempPassword, 10);
   email = req.params.email;
-  console.log(email)
+  console.log(email, currPassword, newPassword);
   /** check if user exists */
   queryString = `
   SELECT id, password, type FROM users
@@ -135,25 +137,30 @@ Router.patch('/changePassword/:email&:currPassword&:newPassword', (req, res) => 
 
   sqlConnection.query(queryString, (err, row, fields) => {
     if (err) {
+      console.log('server error');
       res.send('server error');
     } else {
       if(row.length === 0) {
+        console.log('Invalid User');
         res.send('invalid user');
       } else {
         const passwordFromDB = row[0].password;
-        if(!bcrypt.compareSync(currPassword,passwordFromDB)) {
-          res.send('invalid password');
-        } else {
+        if(bcrypt.compareSync(currPassword,passwordFromDB)) {
           queryString = `
           UPDATE users SET password='${newPassword}'
           WHERE email = '${email}';`;
           sqlConnection.query(queryString, (err, row, fields) => {
             if (err) {
+              console.log('server error update');
               res.send('server error');
             } else {
+              console.log('Success');
               res.send('success');
             }
           });
+        } else {
+          console.log('invalid password');
+          res.send('invalid password');
         }
       }
     }
