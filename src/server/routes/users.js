@@ -3,7 +3,7 @@ const Router = express.Router();
 const sqlConnection = require('../lib/db');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const { generateRandomString } = require('../helpers/helperFunctions');
+const { generateRandomString, getUserByEmail } = require('../helpers/helperFunctions');
 
 let queryString = '';
 let email = '';
@@ -12,7 +12,7 @@ let password = '';
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
   password = decodeURIComponent(req.params.password);
-  console.log('Password from params: ', password);
+  // const userObject = getUserByEmail(email);
   queryString = `
   SELECT id, password, type FROM users
   WHERE email = '${email}';`;
@@ -31,6 +31,7 @@ Router.get("/:email&:password", (req, res) => {
       }
     };
   });
+
 });
 
 /** check if user exists during signup*/
@@ -118,6 +119,44 @@ Router.post('/password-reset/:email', (req, res) => {
         });
       };
     };
+  });
+});
+
+Router.patch('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
+  console.log('in patch...')
+  const currPassword = decodeURIComponent(req.params.currPassword);
+  const newPassword = decodeURIComponent(req.params.newPassword);
+  email = req.params.email;
+  console.log(email)
+  /** check if user exists */
+  queryString = `
+  SELECT id, password, type FROM users
+  WHERE email = '${email}';`;
+
+  sqlConnection.query(queryString, (err, row, fields) => {
+    if (err) {
+      res.send('server error');
+    } else {
+      if(row.length === 0) {
+        res.send('invalid user');
+      } else {
+        const passwordFromDB = row[0].password;
+        if(!bcrypt.compareSync(currPassword,passwordFromDB)) {
+          res.send('invalid password');
+        } else {
+          queryString = `
+          UPDATE users SET password='${newPassword}'
+          WHERE email = '${email}';`;
+          sqlConnection.query(queryString, (err, row, fields) => {
+            if (err) {
+              res.send('server error');
+            } else {
+              res.send('success');
+            }
+          });
+        }
+      }
+    }
   });
 });
 

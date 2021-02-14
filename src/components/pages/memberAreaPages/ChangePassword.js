@@ -97,56 +97,59 @@ export function ChangePassword() {
     }));
   };
 
-  const validateId = (event) => {
+  const changePassword = (event) => {
     event.preventDefault();
     
     if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+      console.log(cookies.userLogged.email);
       setState((prev) => ({
         ...prev,
         email: cookies.userLogged.email,
       }));
+      if (state.password !== state.passwordConfirmation) {
+        setState((prev) => ({
+          ...prev,
+          errors: true,
+          errorText: 'Passwords do not match, please enter matching passwords!'
+        }));
+      } else {
+        /**send email, curr & new password to server to validate and update*/
+        const currPassword = encodeURIComponent(state.currPassword);
+        const newPassword = encodeURIComponent(state.newPassword);
+        axios
+        .patch(`/users/changePassword/${state.email}&${currPassword}&${newPassword}`)
+        .then((res) => {
+          let errorMessage = '';
+          let errorBarColor = 'secondary'
+          if (res.data.length > 0) {
+            switch (res.data) {
+              case 'invalid user':
+                errorMessage = 'User not found!';
+                break;
+              case 'invalid password':
+                errorMessage = 'Incorrect Current Password, please re-enter and try again!';
+                break;
+              case 'server error':
+                errorMessage = 'Server error. Please try again later!';
+                break;
+              default:
+                errorMessage = 'Password Change Success!';
+                errorBarColor = 'primary';
+                break;
+              }
+            setState((prev) => ({
+              ...prev,
+              errors: true,
+              errorText: errorMessage,
+              errorBarColor: errorBarColor,
+            }));
+          };
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
     };
-    if (state.password !== state.passwordConfirmation) {
-      setState((prev) => ({
-        ...prev,
-        errors: true,
-        errorText: 'Passwords do not match, please enter matching passwords!'
-      }));
-    } else {
-      /**send email, curr & new password to server to validate and update*/
-      const currPassword = encodeURIComponent(state.currPassword);
-      const newPassword = encodeURIComponent(state.newPassword);
-      axios
-      .post(`/users/changePassword/${state.email}&${currPassword}&${newPassword}`)
-      .then((res) => {
-        let errorMessage = '';
-        let errorBarColor = 'secondary'
-        if (res.data.length > 0) {
-          switch (res.data) {
-            case 'invalid user':
-              errorMessage = 'User not found!';
-              break;
-            case 'invalid password':
-              errorMessage = 'Incorrect Current Password, please re-enter and try again!';
-              break;
-            case 'server error':
-              errorMessage = 'Server error. Please try again later!';
-              break;
-            default:
-              errorMessage = 'Password Change Success!';
-            }
-          setState((prev) => ({
-            ...prev,
-            error: true,
-            errorText: errorMessage,
-            errorBarColor: errorBarColor
-          }));
-        };
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    }
   };
 
   return (
