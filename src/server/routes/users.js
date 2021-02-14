@@ -1,14 +1,12 @@
 const express = require("express");
 const Router = express.Router();
-const sqlConnection = require('../lib/db');
 const bcrypt = require('bcrypt');
 
-// const { generateRandomString, getUserByEmail } = require('../helpers/helperFunctions');
 const helperFunction = require('../helpers/helperFunctions');
 
-let queryString = '';
 let email = '';
 let password = '';
+let type = '';
 
 /** Check user email and password during login*/
 Router.get("/:email&:password", (req, res) => {
@@ -38,15 +36,13 @@ Router.get("/:email&:password", (req, res) => {
 Router.post("/:email&:password", (req, res) => {
   password = bcrypt.hashSync(req.params.password, 10);
   email = req.params.email;
-  const type = 'MEM';
+  type = 'MEM';
   helperFunction.getUserByEmail(email)
   .then((rows) => {
     if(rows.length === 0) {
       helperFunction.addNewUser(email, password, type)
       .then((rows) => {
-        console.log(rows.insertId);
         if(rows.insertId) {
-          console.log('success')
           res.send('success');
         }
       })
@@ -55,7 +51,6 @@ Router.post("/:email&:password", (req, res) => {
         res.send('server error');
       })  
     } else {
-      console.log('user exists')
       res.send('user exists');
     };
   })
@@ -75,10 +70,8 @@ Router.post('/password-reset/:email', (req, res) => {
       const id = rows[0].id;
       const token = helperFunction.generateRandomString()
       const newPassword = bcrypt.hashSync(token, 10);
-      console.log(newPassword);
       helperFunction.updatePassword(id, newPassword)
       .then((rows) => {
-        console.log(rows.affectedRows);
         if(rows.affectedRows === 1) {
           helperFunction.sendPasswordResetEmail(email, token)
           .then((info) => {
@@ -103,46 +96,37 @@ Router.post('/password-reset/:email', (req, res) => {
 });
 
 Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
-  console.log('in patch...')
   const currPassword = decodeURIComponent(req.params.currPassword);
   const tempPassword = decodeURIComponent(req.params.newPassword);
   const newPassword = bcrypt.hashSync(tempPassword, 10);
   email = req.params.email;
-  console.log(email, currPassword, newPassword);
-  /** check if user exists */
-  queryString = `
-  SELECT id, password, type FROM users
-  WHERE email = '${email}';`;
 
-  sqlConnection.query(queryString, (err, row, fields) => {
-    if (err) {
-      console.log('server error');
-      res.send('server error');
+  helperFunction.getUserByEmail(email)
+  .then((rows) => {
+    if(rows.length === 0) {
+      res.send('invalid user');
     } else {
-      if(row.length === 0) {
-        console.log('Invalid User');
-        res.send('invalid user');
+      const passwordFromDB = rows[0].password;
+      if (!bcrypt.compareSync(currPassword,passwordFromDB)) {
+        res.send('invalid password');
       } else {
-        const passwordFromDB = row[0].password;
-        if(bcrypt.compareSync(currPassword,passwordFromDB)) {
-          queryString = `
-          UPDATE users SET password='${newPassword}'
-          WHERE email = '${email}';`;
-          sqlConnection.query(queryString, (err, row, fields) => {
-            if (err) {
-              console.log('server error update');
-              res.send('server error');
-            } else {
-              console.log('Success');
-              res.send('success');
-            }
-          });
-        } else {
-          console.log('invalid password');
-          res.send('invalid password');
-        }
-      }
-    }
+        const id = rows[0].id
+        helperFunction.updatePassword(id, newPassword)
+        .then((rows) => {
+          if(rows.affectedRows === 1) {
+            res.send('Success');
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          res.send('server error');
+        });
+      };
+    };
+  })
+  .catch((error) => {
+    console.log(error);
+    res.send('server error');
   });
 });
 

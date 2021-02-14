@@ -74,6 +74,7 @@ export function Login() {
     thirdButtonText: "Don't have an account? Sign Up",
     invalidPasswordError: false,
     userExistsError: false,
+    errorBarColor: 'secondary',
   });
 
   const setEmail = (event) => {
@@ -151,6 +152,7 @@ export function Login() {
             ...prev,
             loginError: true,
             loginErrorLabel: 'Please check your email for password reset email!',
+            errorBarColor: 'primary',
             functionState: 'signIn',
             mainButtonText: 'Sign In',
             secondButtonText: 'Forgot Password?',
@@ -276,7 +278,7 @@ export function Login() {
               className={classes.smallOverlay}
               icon={<FaceIcon />}
               label={state.loginErrorLabel}
-              color="secondary"
+              color={state.errorBarColor}
             />
           </div>
           : <></>}

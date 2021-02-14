@@ -6,7 +6,7 @@ let  queryString = '';
 let queryParams = [];
 
 const generateRandomString = function() {
-  let result           = '';
+  let result             = '';
   const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^*()[]{}=|><;*';
   const charactersLength = characters.length;
   for (let i = 0; i < 16; i++) {
@@ -21,14 +21,21 @@ const sendPasswordResetEmail = (email, token) => {
       service: process.env.EMAIL_SERVICE,
       auth: {
         user: process.env.EMAIL_ACCOUNT,
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASSWORD,
       }
     });
     const message = {
       from: process.env.EMAIL_ACCOUNT,
       to: email,
       subject: 'Password Reset',
-      html: '<h4><b>You requested a password reset</b></h4>' + token + '<br /><p>Jain Society Of Calgary</p>'
+      html: `
+      <h4><b>You requested a password reset</b></h4> 
+      ${token} 
+      <br /> 
+      <p> Change your password after logging in using the above temporary password.</p>
+      <br />
+      <p>Please contact the system administrator at <a href='calgaryjains@gmail.com'>calgaryjains@gmail.com</a> if you have any issues.</p>
+      <p>Jain Society Of Calgary</p>`
     };
     return new Promise(function(resolve, reject) {
       return transporter.sendMail(message, function(error, info) {
