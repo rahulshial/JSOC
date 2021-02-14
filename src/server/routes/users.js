@@ -8,7 +8,7 @@ let email = '';
 let password = '';
 let type = '';
 
-/** Check user email and password during login*/
+/** SIGN IN Route */
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
   password = decodeURIComponent(req.params.password);
@@ -32,7 +32,7 @@ Router.get("/:email&:password", (req, res) => {
 });
 
 
-/** add new user to database thru signup*/
+/** SIGN UP Route*/
 Router.post("/:email&:password", (req, res) => {
   password = bcrypt.hashSync(req.params.password, 10);
   email = req.params.email;
@@ -60,6 +60,7 @@ Router.post("/:email&:password", (req, res) => {
   });
 });
 
+/**PASSWORD RESET Route */
 Router.post('/password-reset/:email', (req, res) => {
   email = req.params.email;
   helperFunction.getUserByEmail(email)
@@ -95,6 +96,7 @@ Router.post('/password-reset/:email', (req, res) => {
   });
 });
 
+/** CHANGE PASSWORD Route */
 Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
   const currPassword = decodeURIComponent(req.params.currPassword);
   const tempPassword = decodeURIComponent(req.params.newPassword);
@@ -130,4 +132,5 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
   });
 });
 
+/** MODULE EXPORTS */
 module.exports = Router;
