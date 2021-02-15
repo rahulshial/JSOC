@@ -10,14 +10,15 @@ export default function useApplicationData() {
     email:'',
     password: '',
     passwordConfirmation: '',
-    loginError: false,
-    loginErrorLabel: '',
+    currPassword: '',
+    newPassword: '',
+    newPasswordConfirmation: '',
+    errorFlag: false,
+    errorText: '',
     mainButtonText: 'Sign In',
     functionState: 'signIn',
     secondButtonText: 'Forgot Password?',
     thirdButtonText: "Don't have an account? Sign Up",
-    invalidPasswordError: false,
-    userExistsError: false,
     errorBarColor: 'secondary',
   });
 
@@ -42,6 +43,26 @@ export default function useApplicationData() {
     }));
   };
 
+  const setCurrPassword = (event) => {
+    setState((prev) => ({
+      ...prev,
+      currPassword: event.target.value,
+    }));
+  };
+
+  const setNewPassword = (event) => {
+    setState((prev) => ({
+      ...prev,
+      newPassword: event.target.value,
+    }));
+  };
+
+  const setNewPasswordConfirmation = (event) => {
+    setState((prev) => ({
+      ...prev,
+      newPasswordConfirmation: event.target.value,
+    }));
+  };
 
   const changeState = (event) => {
     event.preventDefault();
@@ -83,120 +104,113 @@ export default function useApplicationData() {
 
   const signInProcess = () => {
     const encodedPassword = encodeURIComponent(state.password);
-    axios
-    .get(`/users/${state.email}&${encodedPassword}`)
-    .then((res) => {
-      if (res.data.length > 0) {
-        if(res.data === 'server error') {
-          setState((prev) => ({
-            ...prev,
-            loginError: true,
-            loginErrorLabel: 'Server Error. Please try again later!!!',
-          }));
-        } else if (res.data === 'invalid user') {
-          setState((prev) => ({
-            ...prev,
-            loginError: true,
-            loginErrorLabel: 'Email / Password combination does not exist',
-          }));
-        } else {
+    if (!state.email || !state.password){
+      setState((prev) => ({
+        ...prev,
+        errorFlag: true,
+        errorText: 'Email / Password cannot be blank!',
+      }));
+    } else {
+      axios
+      .get(`/users/${state.email}&${encodedPassword}`)
+      .then((res) => {
+        console.log('sign in process: ',res);
+        if (res.status === 200) {
           const email = state.email;
-          const type = res.data[0].type;
+          const type = res.data.rows[0].type;
           setCookie("userLogged", { email, type }, { path: "/" });
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
-        }
-      };
-    })
-    .catch((error) => {
-      console.log(error);
-      setState((prev) => ({
-        ...prev,
-        loginError: true,
-        loginErrorLabel: 'Server Error. Please try again later!!!',
-      }));
-    });
+        } else if (res.status === 204 || res.status === 206) {
+          setState((prev) => ({
+            ...prev,
+            errorFlag: true,
+            errorText: 'Email / Password combination does not exist',
+          }));
+        };
+      })
+      .catch((error) => {
+        console.log(error);
+        setState((prev) => ({
+          ...prev,
+          errorFlag: true,
+          errorText: 'Server Error. Please try again later!!!',
+        }));
+      });
+    }
   };
 
   const passwordResetProcess = () => {
     axios
     .post(`/users/password-reset/${state.email}`)
     .then((res) => {
-      if (res.data.length > 0) {
-        if (res.data === 'invalid user') {
-          setState((prev) => ({
-            ...prev,
-            loginError: true,
-            loginErrorLabel: 'User email not found!',
-          }));
-        } else if (res.data === 'success') {
-          setState((prev) => ({
-            ...prev,
-            loginError: true,
-            loginErrorLabel: 'Please check your email for password reset email!',
-            errorBarColor: 'primary',
-            functionState: 'signIn',
-            mainButtonText: 'Sign In',
-            secondButtonText: 'Forgot Password?',
-            thirdButtonText: "Don't have an account? Sign Up",
-          }));
-        } else {
-          setState((prev) => ({
-            ...prev,
-            loginError: true,
-            loginErrorLabel: 'Error sending email, please try again later!',
-            functionState: 'signIn',
-            mainButtonText: 'Sign In',
-            secondButtonText: 'Forgot Password?',
-            thirdButtonText: "Don't have an account? Sign Up",
-          }));
-        }
+      if(res.status === 204) {
+        setState((prev) => ({
+          ...prev,
+          errorFlag: true,
+          errorText: 'User not found! Please check the email address entered!',
+        }));
+      } else if (res.status === 200) {
+        setState((prev) => ({
+          ...prev,
+          errorFlag: true,
+          errorText: 'Please check your email for password reset email!',
+          errorBarColor: 'primary',
+          functionState: 'signIn',
+          mainButtonText: 'Sign In',
+          secondButtonText: 'Forgot Password?',
+          thirdButtonText: "Don't have an account? Sign Up",
+        }));
       }
     })
     .catch((error) => {
       setState((prev) => ({
         ...prev,
-        loginError: true,
-        loginErrorLabel: 'Error Retrieving Data, please try again later!',
+        errorFlag: true,
+        errorText: 'Server Error. Please try again later!',
       }));
     });
   };
 
   const signUpProcess = () => {
-    if (state.password !== state.passwordConfirmation) {
+    if (!state.email || !state.password){
       setState((prev) => ({
         ...prev,
-        loginError: true,
-        loginErrorLabel: 'Passwords do not match!',
+        errorFlag: true,
+        errorText: 'Email / Password cannot be blank!',
+      }));
+    } else if (state.password !== state.passwordConfirmation) {
+      setState((prev) => ({
+        ...prev,
+        errorFlag: true,
+        errorText: 'Passwords do not match!',
       }));
     } else {
       axios
       .post(`/users/${state.email}&${state.password}`)
       .then((res) => {
-        if(res.data.length > 0) {
-          if(res.data === "user exists") {
-            setState((prev) => ({
-              ...prev,
-              loginError: true,
-              loginErrorLabel: 'User Exists. Consider Sign In!!!',
-            }));  
-          } else if (res.data === 'success') {
-            const email = state.email;
-            const type = 'MEM';
-            setCookie("userLogged", { email, type }, { path: "/" });
-            history.push('/');
-            history.go(history.length - 1);
-            window.location.reload();    
-          }
+        if(res.status === 201) {
+          const email = state.email;
+          const type = 'MEM';
+          setCookie("userLogged", { email, type }, { path: "/" });
+          history.push('/');
+          history.go(history.length - 1);
+          window.location.reload();  
+        } else if(res.status === 200) {
+          setState((prev) => ({
+            ...prev,
+            errorFlag: true,
+            errorText: 'User Exists. Consider Sign In!!!',
+          }));
         }
       })
       .catch((error) => {
         console.log(error);
         setState((prev) => ({
           ...prev,
-          loginError: true,
-          loginErrorLabel: 'Server Error. Please try again later!!!',
+          errorFlag: true,
+          errorText: 'Server Error. Please try again later!!!',
         }));
       });
     }
@@ -213,6 +227,68 @@ export default function useApplicationData() {
     }
   };
 
+  const changePassword = (event) => {
+    event.preventDefault();
+    if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+      console.log(cookies.userLogged.email);
+      setState((prev) => ({
+        ...prev,
+        email: cookies.userLogged.email,
+      }));
+      console.log(state);
+      if (state.newPassword !== state.newPasswordConfirmation) {
+        setState((prev) => ({
+          ...prev,
+          errors: true,
+          errorText: 'Passwords do not match, please enter matching passwords!'
+        }));
+      } else {
+        /**send email, curr & new password to server to validate and update*/
+        const currPassword = encodeURIComponent(state.currPassword);
+        const newPassword = encodeURIComponent(state.newPassword);
+        axios
+        .post(`/users/changePassword/${cookies.userLogged.email}&${currPassword}&${newPassword}`)
+        .then((res) => {
+          console.log('change password res on update',res);
+          let errorMessage = '';
+          let errorBarColor = 'secondary'
+          if (res.data.length > 0) {
+            switch (res.data) {
+              case 'invalid user':
+                errorMessage = 'User not found!';
+                break;
+              case 'invalid password':
+                errorMessage = 'Incorrect Current Password, please re-enter and try again!';
+                break;
+              case 'server error':
+                errorMessage = 'Server error. Please try again later!';
+                break;
+              case 'success':
+                errorMessage = 'Password Change Success!';
+                errorBarColor = 'primary';
+                break;
+              default:
+                errorMessage = 'Unknown Error!';
+                break;
+              };
+            setState((prev) => ({
+              ...prev,
+              currPassword: '',
+              newPassword: '',
+              newPasswordConfirmation: '',
+              errors: true,
+              errorText: errorMessage,
+              errorBarColor: errorBarColor,
+            }));
+          };
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
+    };
+  };
+
   return {
     state,
     setEmail,
@@ -220,8 +296,9 @@ export default function useApplicationData() {
     changeState,
     setPasswordConfirmation,
     processEvent,
-    // signInProcess,
-    // passwordResetProcess,
-    // signUpProcess,
+    setCurrPassword,
+    setNewPassword,
+    setNewPasswordConfirmation,
+    changePassword,
   };
 };

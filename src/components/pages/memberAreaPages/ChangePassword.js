@@ -1,7 +1,5 @@
-import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom';
-import axios from 'axios';
-import { useCookies } from "react-cookie";
+import React from 'react'
+
 /** Material UI imports */
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -15,6 +13,7 @@ import Chip from "@material-ui/core/Chip";
 import FaceIcon from "@material-ui/icons/Face";
 
 /** Local Imports */
+import useApplicationData from '../../../hooks/useApplicationData';
 
 const Copyright = () => {
   return (
@@ -57,100 +56,7 @@ const useStyles = makeStyles((theme) => ({
 
 export function ChangePassword() {
   const classes = useStyles();
-  const [cookies, setCookie] = useCookies(["name"]);
-  const history = useHistory();
-  const [state, setState] = useState({
-    email:'',
-    currPassword: '',
-    newPassword: '',
-    newPasswordConfirmation: '',
-    errors: false,
-    errortext: '',
-    errorBarColor: 'secondary'
-  });
-
-  const setCurrPassword = (event) => {
-    setState((prev) => ({
-      ...prev,
-      currPassword: event.target.value,
-    }));
-  };
-
-  const setNewPassword = (event) => {
-    setState((prev) => ({
-      ...prev,
-      newPassword: event.target.value,
-    }));
-  };
-
-  const setNewPasswordConfirmation = (event) => {
-    setState((prev) => ({
-      ...prev,
-      newPasswordConfirmation: event.target.value,
-    }));
-  };
-
-  const changePassword = (event) => {
-    event.preventDefault(); 
-    if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
-      console.log(cookies.userLogged.email);
-      setState((prev) => ({
-        ...prev,
-        email: cookies.userLogged.email,
-      }));
-      console.log(state);
-      if (state.newPassword !== state.newPasswordConfirmation) {
-        setState((prev) => ({
-          ...prev,
-          errors: true,
-          errorText: 'Passwords do not match, please enter matching passwords!'
-        }));
-      } else {
-        /**send email, curr & new password to server to validate and update*/
-        const currPassword = encodeURIComponent(state.currPassword);
-        const newPassword = encodeURIComponent(state.newPassword);
-        axios
-        .post(`/users/changePassword/${cookies.userLogged.email}&${currPassword}&${newPassword}`)
-        .then((res) => {
-          console.log('change password res on update',res);
-          let errorMessage = '';
-          let errorBarColor = 'secondary'
-          if (res.data.length > 0) {
-            switch (res.data) {
-              case 'invalid user':
-                errorMessage = 'User not found!';
-                break;
-              case 'invalid password':
-                errorMessage = 'Incorrect Current Password, please re-enter and try again!';
-                break;
-              case 'server error':
-                errorMessage = 'Server error. Please try again later!';
-                break;
-              case 'success':
-                errorMessage = 'Password Change Success!';
-                errorBarColor = 'primary';
-                break;
-              default:
-                errorMessage = 'Unknown Error!';
-                break;
-              };
-            setState((prev) => ({
-              ...prev,
-              currPassword: '',
-              newPassword: '',
-              newPasswordConfirmation: '',
-              errors: true,
-              errorText: errorMessage,
-              errorBarColor: errorBarColor,
-            }));
-          };
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      }
-    };
-  };
+  const { state, setCurrPassword, setNewPassword, setNewPasswordConfirmation, changePassword } = useApplicationData();
 
   return (
     <Container component="main" maxWidth="xs">
