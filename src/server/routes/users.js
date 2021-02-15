@@ -100,7 +100,7 @@ Router.post('/password-reset/:email', (req, res) => {
   .then((rows) => {
     if(rows.length === 0) {
       res.status(204).send({
-        message: "User email not found!!"
+        message: "User not found!!"
       });
     } else {
       const id = rows[0].id;
@@ -149,29 +149,39 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
   helperFunction.getUserByEmail(email)
   .then((rows) => {
     if(rows.length === 0) {
-      res.send('invalid user');
+      res.status(204).send({
+        message: "User not Found"
+      });
     } else {
       const passwordFromDB = rows[0].password;
       if (!bcrypt.compareSync(currPassword,passwordFromDB)) {
-        res.send('invalid password');
+        res.status(206).send({
+          message: "Password does not match"
+        });
       } else {
         const id = rows[0].id
         helperFunction.updatePassword(id, newPassword)
         .then((rows) => {
           if(rows.affectedRows === 1) {
-            res.send('success');
+            res.status(200).send({
+              message: "Password Changed"
+            });
           }
         })
         .catch((error) => {
           console.log(error);
-          res.send('server error');
+          res.status(500).send({
+            message: "Server Error!"
+          });
         });
       };
     };
   })
   .catch((error) => {
     console.log(error);
-    res.send('server error');
+    res.status(500).send({
+      message: "Server Error!"
+    });
   });
 });
 

@@ -174,7 +174,7 @@ export default function useApplicationData() {
   };
 
   const signUpProcess = () => {
-    if (!state.email || !state.password){
+    if (!state.email || !state.password || !state.passwordConfirmation){
       setState((prev) => ({
         ...prev,
         errorFlag: true,
@@ -229,6 +229,13 @@ export default function useApplicationData() {
 
   const changePassword = (event) => {
     event.preventDefault();
+    if (!state.currPassword || !state.newPassword || !state.newPasswordConfirmation){
+      setState((prev) => ({
+        ...prev,
+        errorFlag: true,
+        errorText: 'Password cannot be blank!',
+      }));
+    } else 
     if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
       console.log(cookies.userLogged.email);
       setState((prev) => ({
@@ -239,7 +246,7 @@ export default function useApplicationData() {
       if (state.newPassword !== state.newPasswordConfirmation) {
         setState((prev) => ({
           ...prev,
-          errors: true,
+          errorFlag: true,
           errorText: 'Passwords do not match, please enter matching passwords!'
         }));
       } else {
@@ -252,20 +259,16 @@ export default function useApplicationData() {
           console.log('change password res on update',res);
           let errorMessage = '';
           let errorBarColor = 'secondary'
-          if (res.data.length > 0) {
-            switch (res.data) {
-              case 'invalid user':
-                errorMessage = 'User not found!';
-                break;
-              case 'invalid password':
-                errorMessage = 'Incorrect Current Password, please re-enter and try again!';
-                break;
-              case 'server error':
-                errorMessage = 'Server error. Please try again later!';
-                break;
-              case 'success':
+            switch (res.status) {
+              case 200:
                 errorMessage = 'Password Change Success!';
                 errorBarColor = 'primary';
+                break;
+              case 204:
+                errorMessage = 'User not found!';
+                break;
+              case 206:
+                errorMessage = 'Current Password does not match!';
                 break;
               default:
                 errorMessage = 'Unknown Error!';
@@ -280,7 +283,6 @@ export default function useApplicationData() {
               errorText: errorMessage,
               errorBarColor: errorBarColor,
             }));
-          };
         })
         .catch((error) => {
           console.log(error);
