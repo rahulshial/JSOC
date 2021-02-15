@@ -16,8 +16,6 @@ if (process.env.DATABASE_URL) {
 };
 
 const sqlConnection = mysql.createConnection(dbParams);
-// const sqlPool = mysql.createPool(dbParams);
-
 
 sqlConnection.connect((err)=> {
 	if(err) {

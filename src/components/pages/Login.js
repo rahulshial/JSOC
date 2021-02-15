@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Chip from "@material-ui/core/Chip";
 import FaceIcon from "@material-ui/icons/Face";
+import { TramRounded } from '@material-ui/icons';
 
 /** Local Imports */
 
@@ -101,39 +102,39 @@ export function Login() {
   const signInProcess = () => {
     const encodedPassword = encodeURIComponent(state.password);
     axios
-      .get(`/users/${state.email}&${encodedPassword}`)
-      .then((res) => {
-        if (res.data.length > 0) {
-          if(res.data === 'server error') {
-            setState((prev) => ({
-              ...prev,
-              loginError: true,
-              loginErrorLabel: 'Server Error. Please try again later!!!',
-            }));
-          } else if (res.data === 'invalid user') {
-            setState((prev) => ({
-              ...prev,
-              loginError: true,
-              loginErrorLabel: 'Email / Password combination does not exist',
-            }));
-          } else {
-            const email = state.email;
-            const type = res.data[0].type;
-            setCookie("userLogged", { email, type }, { path: "/" });
-            history.push('/');
-            history.go(history.length - 1);
-            window.location.reload();
-          }
-        };
-      })
-      .catch((error) => {
-        console.log(error);
-        setState((prev) => ({
-          ...prev,
-          loginError: true,
-          loginErrorLabel: 'Server Error. Please try again later!!!',
-        }));
-      });
+    .get(`/users/${state.email}&${encodedPassword}`)
+    .then((res) => {
+      if (res.data.length > 0) {
+        if(res.data === 'server error') {
+          setState((prev) => ({
+            ...prev,
+            loginError: true,
+            loginErrorLabel: 'Server Error. Please try again later!!!',
+          }));
+        } else if (res.data === 'invalid user') {
+          setState((prev) => ({
+            ...prev,
+            loginError: true,
+            loginErrorLabel: 'Email / Password combination does not exist',
+          }));
+        } else {
+          const email = state.email;
+          const type = res.data[0].type;
+          setCookie("userLogged", { email, type }, { path: "/" });
+          history.push('/');
+          history.go(history.length - 1);
+          window.location.reload();
+        }
+      };
+    })
+    .catch((error) => {
+      console.log(error);
+      setState((prev) => ({
+        ...prev,
+        loginError: true,
+        loginErrorLabel: 'Server Error. Please try again later!!!',
+      }));
+    });
   };
 
   const passwordResetProcess = () => {
