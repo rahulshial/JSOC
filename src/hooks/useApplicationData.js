@@ -21,6 +21,66 @@ export default function useApplicationData() {
     errorBarColor: 'secondary',
   });
 
+  const setEmail = (event) => {
+    setState((prev) => ({
+      ...prev,
+      email: event.target.value,
+    }));
+  };
+
+  const setPassword = (event) => {
+    setState((prev) => ({
+      ...prev,
+      password: event.target.value,
+    }));
+  };
+
+  const setPasswordConfirmation = (event) => {
+    setState((prev) => ({
+      ...prev,
+      passwordConfirmation: event.target.value,
+    }));
+  };
+
+
+  const changeState = (event) => {
+    event.preventDefault();
+    const buttonClicked = event.target.childNodes[0].parentElement.attributes[1].nodeValue;
+    if(state.functionState === 'signIn' && buttonClicked === 'secondButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'passwordReset',
+        mainButtonText: 'Send Password Reset Email',
+        secondButtonText: 'Sign In',
+        thirdButtonText: "Don't have an account? Sign Up",
+      }));
+    } else if(state.functionState === 'passwordReset' && buttonClicked === 'secondButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'signIn',
+        mainButtonText: 'Sign In',
+        secondButtonText: 'Forgot Password?',
+        thirdButtonText: "Don't have an account? Sign Up",
+      }));  
+    } else if(buttonClicked === 'thirdButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'signUp',
+        mainButtonText: 'Create Account',
+        secondButtonText: 'Sign In?',
+        thirdButtonText: ''
+      }));
+    } else if(state.functionState === 'signUp' && buttonClicked === 'secondButton') {
+      setState((prev) => ({
+        ...prev,
+        functionState: 'signIn',
+        mainButtonText: 'Sign In',
+        secondButtonText: 'Forgot Password?',
+        thirdButtonText: "Don't have an account? Sign Up",
+      }));
+    };
+  };
+
   const signInProcess = () => {
     const encodedPassword = encodeURIComponent(state.password);
     axios
@@ -142,11 +202,26 @@ export default function useApplicationData() {
     }
   };
 
+  const processEvent = (event) => {
+    event.preventDefault();
+    if(state.functionState === 'signIn') {
+      signInProcess();
+    } else if(state.functionState === 'passwordReset') {
+      passwordResetProcess();
+    } else if(state.functionState === 'signUp') {
+      signUpProcess();
+    }
+  };
+
   return {
     state,
-    setState,
-    signInProcess,
-    passwordResetProcess,
-    signUpProcess,
+    setEmail,
+    setPassword,
+    changeState,
+    setPasswordConfirmation,
+    processEvent,
+    // signInProcess,
+    // passwordResetProcess,
+    // signUpProcess,
   };
 };
