@@ -61,8 +61,6 @@ Router.post("/:email&:password", (req, res) => {
   helperFunction.getUserByEmail(email)
   .then(async(rows) => {
     if(rows.length === 0) {
-      const {valid, reason, validators } = await helperFunction.isEmailValid(email);
-      console.log(valid, reason, validators);
       helperFunction.addNewUser(email, password, type)
       .then((rows) => {
         if(rows.insertId) {

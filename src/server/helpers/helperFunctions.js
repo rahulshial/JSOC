@@ -1,6 +1,5 @@
 const sqlConnection = require('../lib/db');
 const nodemailer = require('nodemailer');
-const emailValidator = require('deep-email-validator');
 
 /** Global Declarations */
 let  queryString = '';
@@ -14,10 +13,6 @@ const generateRandomString = function() {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-};
-
-async function isEmailValid(email) {
-  return emailValidator.validate(email);
 };
 
 const sendPasswordResetEmail = (email, token) => {
@@ -110,5 +105,4 @@ module.exports = {
   addNewUser,
   updatePassword,
   sendPasswordResetEmail,
-  isEmailValid,
 };
