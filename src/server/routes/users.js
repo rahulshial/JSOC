@@ -1,7 +1,7 @@
 const express = require("express");
 const Router = express.Router();
 const bcrypt = require('bcrypt');
-const emailValidator = require('deep-email-validator');
+
  
 const helperFunction = require('../helpers/helperFunctions');
 
@@ -9,9 +9,6 @@ let email = '';
 let password = '';
 let type = '';
 
-async function isEmailValid(email) {
-  return emailValidator.validate(email)
-};
   
 /** SIGN IN Route */
 Router.get("/:email&:password", (req, res) => {
@@ -62,8 +59,10 @@ Router.post("/:email&:password", (req, res) => {
     });
   };
   helperFunction.getUserByEmail(email)
-  .then((rows) => {
+  .then(async(rows) => {
     if(rows.length === 0) {
+      const {valid, reason, validators } = await helperFunction.isEmailValid(email);
+      console.log(valid, reason, validators);
       helperFunction.addNewUser(email, password, type)
       .then((rows) => {
         if(rows.insertId) {
