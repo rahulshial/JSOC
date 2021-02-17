@@ -23,12 +23,8 @@ export default function useApplicationData() {
     errorBarColor: 'secondary',
     passwordStrengthScore: '',
     passwordStrength: '',
-    passwordMeterColor: '',
   });
   const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
-  // const passwordMeterColor = ['#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#006400'];
-  
-
 
   const setEmail = (event) => {
     setState((prev) => ({
@@ -45,7 +41,6 @@ export default function useApplicationData() {
       password: event.target.value,
       passwordStrengthScore: evaluation.score,
       passwordStrength: passwordStrengthText[evaluation.score],
-      passwordMeterColor: passwordMeterColor[evaluation.score],
     }));
   };
 
@@ -135,7 +130,7 @@ export default function useApplicationData() {
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
-        } else if (res.status === 204 || res.status === 206) {
+        } else if (res.status === 206) {
           setState((prev) => ({
             ...prev,
             errorFlag: true,

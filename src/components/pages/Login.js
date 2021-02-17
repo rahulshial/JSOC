@@ -17,6 +17,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 
 /** Local Imports */
 import useApplicationData from '../../hooks/useApplicationData';
+import { PlayCircleFilledWhite } from '@material-ui/icons';
 
 const Copyright = () => {
   return (
@@ -61,18 +62,23 @@ const useStyles = makeStyles((theme) => ({
   },
   class1: {
     backgroundColor: '#FF0000',
+    color: '#FF0000',
   },
   class2: {
-    backgroundColor: '#FFA500'
+    backgroundColor: '#FFA500',
+    color: '#FFA500',
   },
   class3: {
     backgroundColor: '#FFFF00',
+    color: '#FFFF00',
   },
   class4: {
     backgroundColor: '#00FF00',
+    color: '#00FF00',
   },
   class5: {
     backgroundColor: '#006400',
+    color: '#006400',
   },
 }));
 
@@ -85,12 +91,11 @@ export function Login() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {state.loginError? 
+        {state.errorFlag? 
           <div className={classes.root}>
             <Chip
-              className={classes.smallOverlay}
               icon={<FaceIcon />}
-              label={state.loginErrorLabel}
+              label={state.errorText}
               color={state.errorBarColor}
             />
           </div>
@@ -133,8 +138,10 @@ export function Login() {
                 {state.password.length > 0? 
                   <div className={classes.passwordStrength}>
                     <Chip className={passwordMeterColor[state.passwordStrengthScore]}
-                      label={state.passwordStrength}
+                      size='small'
+                      label='PASSWORD STRENGTH'
                     />
+                    <b>   {state.passwordStrength}</b>
                   </div>
                   : <></>}
                 <div className={classes.passwordRules}>
