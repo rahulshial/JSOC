@@ -34,7 +34,7 @@ export default function useApplicationData() {
   };
 
   const setPassword = (event) => {
-    const evaluation = zxcvbn(event.target.value);
+    const evaluation = zxcvbn(event.target.value, [state.email.split('@')[0]]);
 
     setState((prev) => ({
       ...prev,
@@ -130,7 +130,7 @@ export default function useApplicationData() {
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
-        } else if (res.status === 206) {
+        } else if (res.status === 206 || res.status === 206) {
           setState((prev) => ({
             ...prev,
             errorFlag: true,
@@ -193,6 +193,18 @@ export default function useApplicationData() {
         ...prev,
         errorFlag: true,
         errorText: 'Passwords do not match!',
+      }));
+    } else if(state.password.includes(state.email.split('@')[0])) {
+      setState((prev) => ({
+        ...prev,
+        errorFlag: true,
+        errorText: 'Password cannot contain email address!!',
+      }));
+    } else if(state.password.length < 8) {
+      setState((prev) => ({
+        ...prev,
+        errorFlag: true,
+        errorText: 'Email / Password cannot be less than 8 characters!',
       }));
     } else {
       axios

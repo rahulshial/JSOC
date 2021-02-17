@@ -13,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Chip from "@material-ui/core/Chip";
 import FaceIcon from "@material-ui/icons/Face";
+import ErrorTwoToneIcon from '@material-ui/icons/ErrorTwoTone';
 import Tooltip from '@material-ui/core/Tooltip';
 
 /** Local Imports */
@@ -93,8 +94,8 @@ export function Login() {
       <div className={classes.paper}>
         {state.errorFlag? 
           <div className={classes.root}>
+            {state.errorIcon}
             <Chip
-              icon={<FaceIcon />}
               label={state.errorText}
               color={state.errorBarColor}
             />
