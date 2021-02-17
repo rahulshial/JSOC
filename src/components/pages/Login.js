@@ -13,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Chip from "@material-ui/core/Chip";
 import FaceIcon from "@material-ui/icons/Face";
+import Tooltip from '@material-ui/core/Tooltip';
 
 /** Local Imports */
 import useApplicationData from '../../hooks/useApplicationData';
@@ -54,10 +55,30 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  passwordRules: {
+    fontSize: '.7em',
+    margin: '0',
+  },
+  class1: {
+    backgroundColor: '#FF0000',
+  },
+  class2: {
+    backgroundColor: '#FFA500'
+  },
+  class3: {
+    backgroundColor: '#FFFF00',
+  },
+  class4: {
+    backgroundColor: '#00FF00',
+  },
+  class5: {
+    backgroundColor: '#006400',
+  },
 }));
 
 export function Login() {
   const classes = useStyles();
+  const passwordMeterColor = [`${classes.class1}`, `${classes.class2}`,`${classes.class3}`,`${classes.class4}`,`${classes.class5}`];
   const { state, setEmail, setPassword, setPasswordConfirmation, changeState, processEvent } = useApplicationData();
 
   return (
@@ -98,16 +119,34 @@ export function Login() {
               onChange={setPassword}/>
               : <></>}
           {state.functionState === 'signUp'?
-            <TextField 
-              variant="outlined" 
-              margin="normal" 
-              required fullWidth 
-              name="passwordConfirmation"
-              label="Password Confirmation" 
-              type="password" 
-              id="passwordConfirmation" 
-              autoComplete=""
-              onChange={setPasswordConfirmation}/>
+            <div>
+              <TextField 
+                variant="outlined" 
+                margin="normal" 
+                required fullWidth 
+                name="passwordConfirmation"
+                label="Password Confirmation" 
+                type="password" 
+                id="passwordConfirmation" 
+                autoComplete=""
+                onChange={setPasswordConfirmation}/>
+                {state.password.length > 0? 
+                  <div className={classes.passwordStrength}>
+                    <Chip className={passwordMeterColor[state.passwordStrengthScore]}
+                      label={state.passwordStrength}
+                    />
+                  </div>
+                  : <></>}
+                <div className={classes.passwordRules}>
+                  <ul>
+                    <li>8 - 64 characters</li>
+                    <li>Besides Uppercase & Lowercase letters,<br />
+                        include at least one number and <br/>
+                        one symbol !@#$%^&*+-=(){}[]? &lt &gt</li>
+                    <li>Password is case sensitive</li>
+                  </ul>
+                </div>                         
+            </div>
               : <></>}
           <Button 
             type="submit" 

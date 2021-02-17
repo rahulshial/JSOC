@@ -2,6 +2,7 @@ import { useState} from 'react';
 import axios from 'axios';
 import { useCookies } from "react-cookie";
 import { useHistory } from 'react-router-dom';
+import zxcvbn from 'zxcvbn';
 
 export default function useApplicationData() {
   const [cookies, setCookie] = useCookies(["name"]);
@@ -20,7 +21,14 @@ export default function useApplicationData() {
     secondButtonText: 'Forgot Password?',
     thirdButtonText: "Don't have an account? Sign Up",
     errorBarColor: 'secondary',
+    passwordStrengthScore: '',
+    passwordStrength: '',
+    passwordMeterColor: '',
   });
+  const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
+  // const passwordMeterColor = ['#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#006400'];
+  
+
 
   const setEmail = (event) => {
     setState((prev) => ({
@@ -30,9 +38,14 @@ export default function useApplicationData() {
   };
 
   const setPassword = (event) => {
+    const evaluation = zxcvbn(event.target.value);
+
     setState((prev) => ({
       ...prev,
       password: event.target.value,
+      passwordStrengthScore: evaluation.score,
+      passwordStrength: passwordStrengthText[evaluation.score],
+      passwordMeterColor: passwordMeterColor[evaluation.score],
     }));
   };
 
@@ -291,6 +304,20 @@ export default function useApplicationData() {
     };
   };
 
+  const passwordStrengthFunction = () => {
+
+    // {state.password.length > 0? 
+    //   <div className={classes.passwordStrength}>
+    //     <Chip
+    //       label={state.passwordStrength}
+    //       color={state.passwordMeterColor}
+    //     />
+    //   </div>
+    //   : <></>}
+
+
+  };
+  
   return {
     state,
     setEmail,
@@ -302,5 +329,6 @@ export default function useApplicationData() {
     setNewPassword,
     setNewPasswordConfirmation,
     changePassword,
+    passwordStrengthFunction,
   };
 };
