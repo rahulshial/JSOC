@@ -118,4 +118,19 @@
     - Audio
     - Video
     - Literature
-    
+
+Sign-up functionality:
+- accept email from user
+- if email already exists, error, 
+ - else
+  - create random activation token
+  - create activation record in activation table
+  - create url = localhost:3000/users/activation/:email/:activation code
+  - send email with the activation link and notify the user to check his email / spam
+  - clicking the link will 
+    - search the activation table
+    - if activation code matches,
+    - redirect user to add password - component in login page - state = activation
+    - accept and verify password
+    - create user record, and log him in to the system
+    - delete activation record from activation table.
