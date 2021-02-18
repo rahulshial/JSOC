@@ -4,12 +4,12 @@ import { useCookies } from "react-cookie";
 import { Link, useHistory } from "react-router-dom";
 
 /**Material UI Imports */
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
+import { makeStyles, AppBar, Toolbar, IconButton, CssBaseline, Button } from '@material-ui/core';
+// import AppBar from '@material-ui/core/AppBar';
+// import Toolbar from '@material-ui/core/Toolbar';
+// import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import CssBaseline from '@material-ui/core/CssBaseline';
+// import CssBaseline from '@material-ui/core/CssBaseline';
 
 /** Local Imports */
 import './Navbar.css';
@@ -62,7 +62,7 @@ export function Navbar() {
     } else if(cookies.userLogged.type === 'MEM') {
       MemberArea = <Link className="item-nav" to="/MemberArea">MemberArea</Link>;
     };    
-    AuthButton = <Link className="item-nav" onClick={(event) => {logout(event)}}>Logout</Link>;
+    AuthButton = <Link className="item-nav" to="#" onClick={(event) => {logout(event)}}>Logout</Link>;
   } else {
     AuthButton = <Link className="item-nav" to="/Login">     Login</Link>;
   };

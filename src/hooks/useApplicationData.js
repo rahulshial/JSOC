@@ -236,8 +236,9 @@ export default function useApplicationData() {
         errorText: 'Password - at least 8 characters and contain 1 uppercase, 1 lowercase, 1 number and 1 special character!',
       }));
     } else {
+      const encodedPassword = encodeURIComponent(state.password);
       axios
-      .post(`/users/${state.email}&${state.password}`)
+      .post(`/users/${state.email}&${encodedPassword}`)
       .then((res) => {
         if(res.status === 201) {
           const email = state.email;

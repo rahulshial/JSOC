@@ -14,6 +14,7 @@ let type = '';
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
   password = decodeURIComponent(req.params.password);
+  console.log(email, password);
   if (!email || !password){
     res.status(206).send({
     message: "Email or password missing!."
@@ -28,12 +29,14 @@ Router.get("/:email&:password", (req, res) => {
         });
     } else {
       const passwordFromDB = rows[0].password;
+      console.log(passwordFromDB);
       if(bcrypt.compareSync(password,passwordFromDB)) {
         res.status(200).send({
           message: "User Found!", 
           rows,
           });
       } else {
+        console.log('password dos not match')
         res.status(206).send({
           message: "Password does not match!"
           });
@@ -50,7 +53,9 @@ Router.get("/:email&:password", (req, res) => {
 
 /** SIGN UP Route*/
 Router.post("/:email&:password", (req, res) => {
-  password = bcrypt.hashSync(req.params.password, 10);
+  const decodedPassword = decodeURIComponent(req.params.password);
+  console.log(decodedPassword);
+  password = bcrypt.hashSync(decodedPassword, 10);
   email = req.params.email;
   type = 'MEM';
   if (!email || !password){
