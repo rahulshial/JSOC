@@ -53,6 +53,11 @@ export default function useApplicationData() {
     }));
   };
 
+  const handleChange = (event) => {
+    event.preventDefault();
+    alert('Copy & Paste have been disabled for security reasons')
+  };
+
   const setCurrPassword = (event) => {
     setState((prev) => ({
       ...prev,
@@ -110,6 +115,17 @@ export default function useApplicationData() {
         thirdButtonText: "Don't have an account? Sign Up",
       }));
     };
+  };
+
+  const processEvent = (event) => {
+    event.preventDefault();
+    if(state.functionState === 'signIn') {
+      signInProcess();
+    } else if(state.functionState === 'passwordReset') {
+      passwordResetProcess();
+    } else if(state.functionState === 'signUp') {
+      signUpProcess();
+    }
   };
 
   const signInProcess = () => {
@@ -189,8 +205,7 @@ export default function useApplicationData() {
       return false;
     };
     return regexCheck.test(password);
-
-  }
+  };
 
   const signUpProcess = () => {
     const validRegex = validateRegexFunction(state.password);
@@ -214,13 +229,6 @@ export default function useApplicationData() {
         errorText: 'Password cannot contain email address!!',
       }));
     } 
-    // else if(state.password.length < 8) {
-    //   setState((prev) => ({
-    //     ...prev,
-    //     errorFlag: true,
-    //     errorText: 'Email / Password cannot be less than 8 characters!',
-    //   }));
-    // } 
     else if(!validRegex) {
       setState((prev) => ({
         ...prev,
@@ -257,19 +265,9 @@ export default function useApplicationData() {
     }
   };
 
-  const processEvent = (event) => {
-    event.preventDefault();
-    if(state.functionState === 'signIn') {
-      signInProcess();
-    } else if(state.functionState === 'passwordReset') {
-      passwordResetProcess();
-    } else if(state.functionState === 'signUp') {
-      signUpProcess();
-    }
-  };
-
   const changePassword = (event) => {
     event.preventDefault();
+    const validRegex = validateRegexFunction(state.newPassword);
     if (!state.currPassword || !state.newPassword || !state.newPasswordConfirmation){
       setState((prev) => ({
         ...prev,
@@ -289,6 +287,12 @@ export default function useApplicationData() {
           ...prev,
           errorFlag: true,
           errorText: 'Passwords do not match, please enter matching passwords!'
+        }));
+      } else if(!validRegex) {
+        setState((prev) => ({
+          ...prev,
+          errorFlag: true,
+          errorText: 'Password - at least 8 characters and contain 1 uppercase, 1 lowercase, 1 number and 1 special character!',
         }));
       } else {
         /**send email, curr & new password to server to validate and update*/
@@ -331,20 +335,6 @@ export default function useApplicationData() {
       }
     };
   };
-
-  const passwordStrengthFunction = () => {
-
-    // {state.password.length > 0? 
-    //   <div className={classes.passwordStrength}>
-    //     <Chip
-    //       label={state.passwordStrength}
-    //       color={state.passwordMeterColor}
-    //     />
-    //   </div>
-    //   : <></>}
-
-
-  };
   
   return {
     state,
@@ -357,6 +347,6 @@ export default function useApplicationData() {
     setNewPassword,
     setNewPasswordConfirmation,
     changePassword,
-    passwordStrengthFunction,
+    handleChange,
   };
 };

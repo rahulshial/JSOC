@@ -12,13 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Chip from "@material-ui/core/Chip";
-import FaceIcon from "@material-ui/icons/Face";
-import ErrorTwoToneIcon from '@material-ui/icons/ErrorTwoTone';
-import Tooltip from '@material-ui/core/Tooltip';
 
 /** Local Imports */
 import useApplicationData from '../../hooks/useApplicationData';
-import { PlayCircleFilledWhite } from '@material-ui/icons';
 
 const Copyright = () => {
   return (
@@ -58,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 0, 2),
   },
   passwordRules: {
-    fontSize: '.7em',
+    fontSize: '.8em',
     margin: '0',
   },
   class1: {
@@ -86,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 export function Login() {
   const classes = useStyles();
   const passwordMeterColor = [`${classes.class1}`, `${classes.class2}`,`${classes.class3}`,`${classes.class4}`,`${classes.class5}`];
-  const { state, setEmail, setPassword, setPasswordConfirmation, changeState, processEvent } = useApplicationData();
+  const { state, setEmail, setPassword, setPasswordConfirmation, changeState, processEvent, handleChange } = useApplicationData();
 
   return (
     <Container component="main" maxWidth="xs">
@@ -122,6 +118,7 @@ export function Login() {
               type="password" 
               id="password" 
               autoComplete="current-password"
+              onCopy={(event) => {handleChange(event)}}
               onChange={setPassword}/>
               : <></>}
           {state.functionState === 'signUp'?
@@ -135,6 +132,8 @@ export function Login() {
                 type="password" 
                 id="passwordConfirmation" 
                 autoComplete=""
+                onCopy={(event) => {handleChange(event)}}
+                onPaste={(event) => {handleChange(event)}}
                 onChange={setPasswordConfirmation}/>
                 {state.password.length > 0? 
                   <div className={classes.passwordStrength}>
@@ -146,11 +145,12 @@ export function Login() {
                   </div>
                   : <></>}
                 <div className={classes.passwordRules}>
+                  <p><b>Password Criteria:</b></p>
                   <ul>
                     <li>8 - 64 characters</li>
                     <li>Besides Uppercase & Lowercase letters,<br />
                         include at least one number and <br/>
-                        one symbol !@#$%^&*+-=(){}[]? &lt &gt</li>
+                        one symbol !@#$%^&*+-=(){}[]?&lt;&gt;</li>
                     <li>Password is case sensitive</li>
                   </ul>
                 </div>                         
