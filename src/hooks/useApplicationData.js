@@ -26,6 +26,8 @@ export default function useApplicationData() {
   });
   const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
 
+  const regexCheck = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()+=-\?;,./{}|\":<>\[\]\\\' ~_]).{8,50}/;
+  
   const setEmail = (event) => {
     setState((prev) => ({
       ...prev,
@@ -181,7 +183,18 @@ export default function useApplicationData() {
     });
   };
 
+
+  const validateRegexFunction = (password) => {
+    if (!password) {
+      return false;
+    };
+    return regexCheck.test(password);
+
+  }
+
   const signUpProcess = () => {
+    const validRegex = validateRegexFunction(state.password);
+    console.log(validRegex);
     if (!state.email || !state.password || !state.passwordConfirmation){
       setState((prev) => ({
         ...prev,
@@ -200,11 +213,19 @@ export default function useApplicationData() {
         errorFlag: true,
         errorText: 'Password cannot contain email address!!',
       }));
-    } else if(state.password.length < 8) {
+    } 
+    // else if(state.password.length < 8) {
+    //   setState((prev) => ({
+    //     ...prev,
+    //     errorFlag: true,
+    //     errorText: 'Email / Password cannot be less than 8 characters!',
+    //   }));
+    // } 
+    else if(!validRegex) {
       setState((prev) => ({
         ...prev,
         errorFlag: true,
-        errorText: 'Email / Password cannot be less than 8 characters!',
+        errorText: 'Password - at least 8 characters and contain 1 uppercase, 1 lowercase, 1 number and 1 special character!',
       }));
     } else {
       axios
