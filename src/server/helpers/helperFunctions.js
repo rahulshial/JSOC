@@ -5,6 +5,11 @@ const nodemailer = require('nodemailer');
 let  queryString = '';
 let queryParams = [];
 
+const initQueryVars = (queryString, queryParams) => {
+  queryString = '';
+  queryParams = [];
+};
+
 const generateRandomString = function(length) {
   let result             = '';
   const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^*()[]{}=|><;*';
@@ -31,8 +36,12 @@ const sendEmail = (type, email, token1, token2) => {
         to: email,
         subject: 'Password Reset',
         html: `
-        <h4><b>You requested a password reset</b></h4> 
-        ${token} 
+        <h4><b>Jain Society of Calgary</b></h4> 
+        <br /> 
+        <p> Use the temporary password below to log into your account</p>
+        <br />
+        <p> This password will expire in 24 hours and can only be used once</p>
+        ${token1} 
         <br /> 
         <p> Change your password after logging in using the above temporary password.</p>
         <br />
@@ -42,7 +51,7 @@ const sendEmail = (type, email, token1, token2) => {
     } else if(type === 'Activation') {
       const activationToken = encodeURIComponent(token1);
       const authToken = encodeURIComponent(token2);
-      const URL = `http://localhost:3000/activation/&${activationToken}&auth=${authToken}`
+      const URL = `http://localhost:3000/activation/${email}:${activationToken}:${authToken}`
       message = {
         from: process.env.EMAIL_ACCOUNT,
         to: email,
@@ -71,11 +80,6 @@ const sendEmail = (type, email, token1, token2) => {
       }  
     });
   });
-};
-
-const initQueryVars = (queryString, queryParams) => {
-  queryString = '';
-  queryParams = [];
 };
 
 const getUserByEmail = (email) => {
@@ -135,7 +139,37 @@ const createActivationRecord = (email, password, activation_token, auth_token) =
       return resolve(rows);
     });  
   });
+};
 
+const getUserActivationRecord = (email) => {
+  initQueryVars(queryString, queryParams);
+  queryParams = [email];
+  queryString = `
+  SELECT id, email, password, type, activation_token, auto_token FROM activation
+  WHERE email = ?;`;
+  return new Promise(function(resolve, reject) {
+    return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
+      if(error) {
+        return reject(error)
+      }
+      return resolve(rows);
+    });
+  });
+};
+
+const deleteUserActivationRecord = (email) => {
+  initQueryVars(queryString, queryParams);
+  queryParams = [email];
+  queryString = `
+  DELETE FROM activation WHERE email = ?;`;
+  return new Promise(function(resolve, reject) {
+    return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
+      if(error) {
+        return reject(error)
+      }
+      return resolve(rows);
+    });
+  });
 };
 
 /** Module Exports */
@@ -146,4 +180,6 @@ module.exports = {
   updatePassword,
   sendEmail,
   createActivationRecord,
+  getUserActivationRecord,
+  deleteUserActivationRecord,
 };

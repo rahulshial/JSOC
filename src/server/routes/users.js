@@ -72,13 +72,7 @@ Router.post("/:email&:password", (req, res) => {
             message: "User Created!"
           });
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).send({
-          message: "Server Error!"
-        });
-      })  
+      }) 
     } else {
       res.status(200).send({
         message: "User already exists!"
@@ -105,31 +99,19 @@ Router.post('/password-reset/:email', (req, res) => {
       });
     } else {
       const id = rows[0].id;
-      const token = helperFunction.generateRandomString(16)
-      const newPassword = bcrypt.hashSync(token, 10);
+      const token1 = helperFunction.generateRandomString(16)
+      const newPassword = bcrypt.hashSync(token1, 10);
       helperFunction.updatePassword(id, newPassword)
       .then((rows) => {
         if(rows.affectedRows === 1) {
-          helperFunction.sendEmail('Reset', email, token)
+          helperFunction.sendEmail('Reset', email, token1)
           .then((info) => {
             res.status(200).send({
               message: "Reset Email Sent!"
             });
-          })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).send({
-              message: "Server Error!"
-            });
-          });  
+          })  
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).send({
-          message: "Server Error!"
-        });
-      });    
+      })   
     }
   })
   .catch((error) => {
@@ -169,12 +151,6 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
             });
           }
         })
-        .catch((error) => {
-          console.log(error);
-          res.status(500).send({
-            message: "Server Error!"
-          });
-        });
       };
     };
   })
@@ -186,9 +162,10 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
   });
 });
 
-Router.post('/signUpActivationLink/:email&:password', (req, res) => {
-  const email = req.params.email;
-  const password = decodeURIComponent(req.params.password);
+Router.post('/signUpActivationLink', (req, res) => {
+  const email = req.body.email;
+  const decodedPassword = decodeURIComponent(req.body.password);
+  const password = bcrypt.hashSync(decodedPassword, 10);
   helperFunction.getUserByEmail(email)
   .then((rows) => {
     if(rows.length === 0) {
@@ -203,20 +180,8 @@ Router.post('/signUpActivationLink/:email&:password', (req, res) => {
               message: "Activaton Email Sent!"
             });
           })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).send({
-              message: "Server Error!"
-            });
-          });
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).send({
-          message: "Server Error!"
-        });
-      });   
+      })   
     } else {
       res.status(201).send({
         message: "User already exists!"
@@ -231,6 +196,54 @@ Router.post('/signUpActivationLink/:email&:password', (req, res) => {
   });  
 });
 
+Router.post('/activate', (req, res) => {
+  console.log(req.body)
+  const email = req.body[0];
+  const activationToken = req.body[1];
+  const authToken = req.body[2];
+  helperFunction.getUserActivationRecord(email)
+  .then((rows) => {
+    if(rows.length === 0) {
+      res.status(204).send({
+        message: "User not found!!"
+      });
+    } else {
+      const activationTokenFromDB = rows[0].activation_token;
+      const authTokenFromDB = rows[0].auth_token;
+      const password = rows[0].password;
+      const type = rows[0].type;
+      if (activationToken === activationTokenFromDB && authToken === authTokenFromDB) {
+        helperFunction.addNewUser(email, password, type)
+        .then((rows) => {
+          if(rows.insertId) {
+            helperFunction.deleteUserActivationRecord(email)
+            .then((rows) => {
+              if(rows.affectedRows === 1) {
+                res.status(200).send({
+                  message: 'User Activated',
+                })
+              } else {
+                res.status(500).send({
+                  message: "Server Error!"
+                });
+              };
+            })
+          };
+        })
+      };
+    };
+  })
+  .catch((error) => {
+    console.log(error);
+    res.status(500).send({
+      message: "Server Error!"
+    });
+});
+
+  console.log(email);
+  console.log(activationToken);
+  console.log(authToken);
+});
 
 /** MODULE EXPORTS */
 module.exports = Router;

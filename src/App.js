@@ -26,7 +26,7 @@ function App() {
           <Route path="/ExecutiveArea"><ExecutiveArea /></Route>
           <Route path="/ContactUs">    <ContactUs /></Route>
           <Route path="/Login">        <Login /></Route>
-          <Route path="/Activation/:activatonToken/:authToken"> <Activation /></Route>
+          <Route path="/activation">   <Activation /></Route>
         </Switch>
       </Router>
     </div>

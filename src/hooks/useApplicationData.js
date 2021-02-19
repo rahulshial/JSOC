@@ -236,18 +236,16 @@ export default function useApplicationData() {
         errorText: 'Password - at least 8 characters and contain 1 uppercase, 1 lowercase, 1 number and 1 special character!',
       }));
     } else {
-      const encodedPassword = encodeURIComponent(state.password);
+      const activationDataObj = {
+        email: state.email,
+        encodedPassword: encodeURIComponent(state.password)
+      }
       axios
       // .post(`/users/${state.email}&${encodedPassword}`)
-      .post(`/users/signUpActivationLink/${state.email}&${encodedPassword}`)
+      // .post(`/users/signUpActivationLink/${state.email}&${encodedPassword}`)
+      .post(`/users/signUpActivationLink`, activationDataObj)
       .then((res) => {
         if(res.status === 200) {
-          // const email = state.email;
-          // const type = 'MEM';
-          // setCookie("userLogged", { email, type }, { path: "/" });
-          // history.push('/');
-          // history.go(history.length - 1);
-          // window.location.reload();
           setState((prev) => ({
             ...prev,
             errorFlag: true,
@@ -344,6 +342,11 @@ export default function useApplicationData() {
         })
         .catch((error) => {
           console.log(error);
+          setState((prev) => ({
+            ...prev,
+            errorFlag: true,
+            errorText: 'Server Error. Please try again later!!!',
+          }));
         });
       }
     };
