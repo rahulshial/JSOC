@@ -239,7 +239,7 @@ export default function useApplicationData() {
       const encodedPassword = encodeURIComponent(state.password);
       axios
       // .post(`/users/${state.email}&${encodedPassword}`)
-      .post(`/users/signUpActivationLink/${state.email}`)
+      .post(`/users/signUpActivationLink/${state.email}&${encodedPassword}`)
       .then((res) => {
         if(res.status === 200) {
           // const email = state.email;
@@ -251,7 +251,7 @@ export default function useApplicationData() {
           setState((prev) => ({
             ...prev,
             errorFlag: true,
-            errorText: 'Please check your email for password reset email!',
+            errorText: 'Please check your Inbox / Spam folder for the ACTIVATION email!',
             errorBarColor: 'primary',
             functionState: 'signIn',
             mainButtonText: 'Sign In',
@@ -263,7 +263,7 @@ export default function useApplicationData() {
           setState((prev) => ({
             ...prev,
             errorFlag: true,
-            errorText: 'User Exists. Consider Sign In!!!',
+            errorText: 'User Exists. Consider Signing In!!!',
           }));
         }
       })

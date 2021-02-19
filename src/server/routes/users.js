@@ -186,17 +186,18 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
   });
 });
 
-Router.post('/signUpActivationLink/:email', (req, res) => {
-  const token1 = helperFunction.generateRandomString(60);
-  const token2 = helperFunction.generateRandomString(30);
+Router.post('/signUpActivationLink/:email&:password', (req, res) => {
   const email = req.params.email;
+  const password = decodeURIComponent(req.params.password);
   helperFunction.getUserByEmail(email)
   .then((rows) => {
     if(rows.length === 0) {
-      helperFunction.createActivationRecord(email, token1, token2)
+      const activation_token = helperFunction.generateRandomString(60);
+      const auth_token = helperFunction.generateRandomString(30);
+      helperFunction.createActivationRecord(email, password, activation_token, auth_token)
       .then((rows) => {
         if(rows.insertId) {
-          helperFunction.sendEmail('Activation', email, token1)
+          helperFunction.sendEmail('Activation', email, activation_token, auth_token)
           .then((info) => {
             res.status(200).send({
               message: "Activaton Email Sent!"

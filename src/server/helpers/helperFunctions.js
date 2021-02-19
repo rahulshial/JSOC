@@ -15,7 +15,7 @@ const generateRandomString = function(length) {
   return result;
 };
 
-const sendEmail = (type, email, token) => {
+const sendEmail = (type, email, token1, token2) => {
   let message = '';
   const transporter = 
     nodemailer.createTransport({
@@ -40,7 +40,9 @@ const sendEmail = (type, email, token) => {
         <p>Jain Society Of Calgary</p>`
       };        
     } else if(type === 'Activation') {
-      const URL = `http://localhost:3000/activation/&${token}`
+      const activationToken = encodeURIComponent(token1);
+      const authToken = encodeURIComponent(token2);
+      const URL = `http://localhost:3000/activation/&${activationToken}&auth=${authToken}`
       message = {
         from: process.env.EMAIL_ACCOUNT,
         to: email,
@@ -121,10 +123,10 @@ const updatePassword = (id, newPassword) => {
   });
 };
 
-const createActivationRecord = (email, token1) => {
+const createActivationRecord = (email, password, activation_token, auth_token) => {
   initQueryVars(queryString, queryParams);
-  queryParams = [email, token1];
-  queryString = `INSERT INTO activation (email, activation_token) VALUES (?, ?);`;
+  queryParams = [email, password, activation_token, auth_token];
+  queryString = `INSERT INTO activation (email, password, activation_token, auth_token) VALUES (?, ?, ?, ?);`;
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
       if(error) {
