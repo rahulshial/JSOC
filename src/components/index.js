@@ -12,3 +12,4 @@ export { DirectorySearch } from './pages/memberAreaPages/DirectorySearch';
 export { PersonalInfo } from './pages/memberAreaPages/PersonalInfo';
 export { ChangePassword } from './pages/memberAreaPages/ChangePassword';
 export { MemberNavBar } from './pages/memberAreaPages/MemberNavBar';
+export { Activation } from './pages//Activation';

@@ -125,8 +125,8 @@ const updatePassword = (id, newPassword) => {
 
 const createActivationRecord = (email, password, activation_token, auth_token) => {
   initQueryVars(queryString, queryParams);
-  queryParams = [email, password, activation_token, auth_token];
-  queryString = `INSERT INTO activation (email, password, activation_token, auth_token) VALUES (?, ?, ?, ?);`;
+  queryParams = [email, password, 'MEM', activation_token, auth_token];
+  queryString = `INSERT INTO activation (email, password, type, activation_token, auth_token) VALUES (?, ?, ?, ?, ?);`;
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
       if(error) {
