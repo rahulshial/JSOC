@@ -248,6 +248,9 @@ export default function useApplicationData() {
         if(res.status === 200) {
           setState((prev) => ({
             ...prev,
+            email: '',
+            password:'',
+            passwordConfirmation:'',
             errorFlag: true,
             errorText: 'Please check your Inbox / Spam folder for the ACTIVATION email!',
             errorBarColor: 'primary',
@@ -354,6 +357,7 @@ export default function useApplicationData() {
   
   return {
     state,
+    setState,
     setEmail,
     setPassword,
     changeState,

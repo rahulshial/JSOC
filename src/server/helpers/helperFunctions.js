@@ -67,8 +67,7 @@ const sendEmail = (type, email, token1, token2) => {
         <p>${URL}</p>
         <p>Please contact the system administrator at <a href='calgaryjains@gmail.com'>calgaryjains@gmail.com</a> if you have any issues.</p>
         <p>Jain Society Of Calgary</p>`
-      };
-      console.log(message); 
+      }; 
     };
 
     return new Promise(function(resolve, reject) {
@@ -102,7 +101,7 @@ const addNewUser = (email, password, type) => {
   initQueryVars(queryString, queryParams);
   queryParams = [email, password, type];
   queryString = `INSERT INTO users (email, password, type) VALUES (?, ?, ?);`;
-
+  console.log(queryParams);
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
       if(error) {
@@ -145,7 +144,7 @@ const getUserActivationRecord = (email) => {
   initQueryVars(queryString, queryParams);
   queryParams = [email];
   queryString = `
-  SELECT id, email, password, type, activation_token, auto_token FROM activation
+  SELECT id, email, password, type, activation_token, auth_token FROM activation
   WHERE email = ?;`;
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {

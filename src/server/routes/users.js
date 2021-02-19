@@ -13,7 +13,6 @@ let type = '';
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
   password = decodeURIComponent(req.params.password);
-  console.log(email, password);
   if (!email || !password){
     res.status(206).send({
     message: "Email or password missing!."
@@ -28,14 +27,12 @@ Router.get("/:email&:password", (req, res) => {
         });
     } else {
       const passwordFromDB = rows[0].password;
-      console.log(passwordFromDB);
       if(bcrypt.compareSync(password,passwordFromDB)) {
         res.status(200).send({
           message: "User Found!", 
           rows,
           });
       } else {
-        console.log('password dos not match')
         res.status(206).send({
           message: "Password does not match!"
           });
@@ -53,7 +50,6 @@ Router.get("/:email&:password", (req, res) => {
 /** SIGN UP Route*/
 Router.post("/:email&:password", (req, res) => {
   const decodedPassword = decodeURIComponent(req.params.password);
-  console.log(decodedPassword);
   password = bcrypt.hashSync(decodedPassword, 10);
   email = req.params.email;
   type = 'MEM';
@@ -197,32 +193,41 @@ Router.post('/signUpActivationLink', (req, res) => {
 });
 
 Router.post('/activate', (req, res) => {
-  console.log(req.body)
-  const email = req.body[0];
-  const activationToken = req.body[1];
-  const authToken = req.body[2];
+  const email = req.body.email;
+  const activationToken = req.body.activationToken;
+  const authToken = req.body.authToken;
   helperFunction.getUserActivationRecord(email)
   .then((rows) => {
     if(rows.length === 0) {
+      console.log('no activation record found')
       res.status(204).send({
         message: "User not found!!"
       });
     } else {
+      console.log('Got User Activation Record...');
       const activationTokenFromDB = rows[0].activation_token;
       const authTokenFromDB = rows[0].auth_token;
       const password = rows[0].password;
       const type = rows[0].type;
+      console.log('Activation Token        : ', activationToken);
+      console.log('Activation Token from DB: ', activationTokenFromDB);
+      console.log('Auth Token              : ', authToken);
+      console.log('Auth Token from DB      : ', authTokenFromDB);
       if (activationToken === activationTokenFromDB && authToken === authTokenFromDB) {
+        console.log('Adding new user...');
         helperFunction.addNewUser(email, password, type)
         .then((rows) => {
           if(rows.insertId) {
+            console.log('New user ADDED successfully...deleting activation record');
             helperFunction.deleteUserActivationRecord(email)
             .then((rows) => {
               if(rows.affectedRows === 1) {
+                console.log('user activated')
                 res.status(200).send({
                   message: 'User Activated',
                 })
               } else {
+                console.log('error deleting activation record')
                 res.status(500).send({
                   message: "Server Error!"
                 });
@@ -238,11 +243,7 @@ Router.post('/activate', (req, res) => {
     res.status(500).send({
       message: "Server Error!"
     });
-});
-
-  console.log(email);
-  console.log(activationToken);
-  console.log(authToken);
+  });
 });
 
 /** MODULE EXPORTS */
