@@ -238,16 +238,28 @@ export default function useApplicationData() {
     } else {
       const encodedPassword = encodeURIComponent(state.password);
       axios
-      .post(`/users/${state.email}&${encodedPassword}`)
+      // .post(`/users/${state.email}&${encodedPassword}`)
+      .post(`/users/signUpActivationLink/${state.email}`)
       .then((res) => {
-        if(res.status === 201) {
-          const email = state.email;
-          const type = 'MEM';
-          setCookie("userLogged", { email, type }, { path: "/" });
-          history.push('/');
-          history.go(history.length - 1);
-          window.location.reload();  
-        } else if(res.status === 200) {
+        if(res.status === 200) {
+          // const email = state.email;
+          // const type = 'MEM';
+          // setCookie("userLogged", { email, type }, { path: "/" });
+          // history.push('/');
+          // history.go(history.length - 1);
+          // window.location.reload();
+          setState((prev) => ({
+            ...prev,
+            errorFlag: true,
+            errorText: 'Please check your email for password reset email!',
+            errorBarColor: 'primary',
+            functionState: 'signIn',
+            mainButtonText: 'Sign In',
+            secondButtonText: 'Forgot Password?',
+            thirdButtonText: "Don't have an account? Sign Up",
+          }));
+  
+        } else if(res.status === 201) {
           setState((prev) => ({
             ...prev,
             errorFlag: true,

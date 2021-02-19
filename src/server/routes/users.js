@@ -1,7 +1,6 @@
 const express = require("express");
 const Router = express.Router();
 const bcrypt = require('bcrypt');
-
  
 const helperFunction = require('../helpers/helperFunctions');
 
@@ -64,7 +63,7 @@ Router.post("/:email&:password", (req, res) => {
     });
   };
   helperFunction.getUserByEmail(email)
-  .then(async(rows) => {
+  .then((rows) => {
     if(rows.length === 0) {
       helperFunction.addNewUser(email, password, type)
       .then((rows) => {
@@ -106,12 +105,12 @@ Router.post('/password-reset/:email', (req, res) => {
       });
     } else {
       const id = rows[0].id;
-      const token = helperFunction.generateRandomString()
+      const token = helperFunction.generateRandomString(16)
       const newPassword = bcrypt.hashSync(token, 10);
       helperFunction.updatePassword(id, newPassword)
       .then((rows) => {
         if(rows.affectedRows === 1) {
-          helperFunction.sendPasswordResetEmail(email, token)
+          helperFunction.sendEmail('Reset', email, token)
           .then((info) => {
             res.status(200).send({
               message: "Reset Email Sent!"
@@ -186,6 +185,51 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
     });
   });
 });
+
+Router.post('/signUpActivationLink/:email', (req, res) => {
+  const token1 = helperFunction.generateRandomString(60);
+  const token2 = helperFunction.generateRandomString(30);
+  const email = req.params.email;
+  helperFunction.getUserByEmail(email)
+  .then((rows) => {
+    if(rows.length === 0) {
+      helperFunction.createActivationRecord(email, token1, token2)
+      .then((rows) => {
+        if(rows.insertId) {
+          helperFunction.sendEmail('Activation', email, token1)
+          .then((info) => {
+            res.status(200).send({
+              message: "Activaton Email Sent!"
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            res.status(500).send({
+              message: "Server Error!"
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).send({
+          message: "Server Error!"
+        });
+      });   
+    } else {
+      res.status(201).send({
+        message: "User already exists!"
+      });
+    };
+  })
+  .catch((error) => {
+    console.log(error);
+    res.status(500).send({
+      message: "Server Error!"
+    });
+  });  
+});
+
 
 /** MODULE EXPORTS */
 module.exports = Router;

@@ -5,17 +5,18 @@ const nodemailer = require('nodemailer');
 let  queryString = '';
 let queryParams = [];
 
-const generateRandomString = function() {
+const generateRandomString = function(length) {
   let result             = '';
   const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^*()[]{}=|><;*';
   const charactersLength = characters.length;
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 };
 
-const sendPasswordResetEmail = (email, token) => {
+const sendEmail = (type, email, token) => {
+  let message = '';
   const transporter = 
     nodemailer.createTransport({
       service: process.env.EMAIL_SERVICE,
@@ -24,19 +25,41 @@ const sendPasswordResetEmail = (email, token) => {
         pass: process.env.EMAIL_PASSWORD,
       }
     });
-    const message = {
-      from: process.env.EMAIL_ACCOUNT,
-      to: email,
-      subject: 'Password Reset',
-      html: `
-      <h4><b>You requested a password reset</b></h4> 
-      ${token} 
-      <br /> 
-      <p> Change your password after logging in using the above temporary password.</p>
-      <br />
-      <p>Please contact the system administrator at <a href='calgaryjains@gmail.com'>calgaryjains@gmail.com</a> if you have any issues.</p>
-      <p>Jain Society Of Calgary</p>`
+    if (type === 'Reset') {
+      message = {
+        from: process.env.EMAIL_ACCOUNT,
+        to: email,
+        subject: 'Password Reset',
+        html: `
+        <h4><b>You requested a password reset</b></h4> 
+        ${token} 
+        <br /> 
+        <p> Change your password after logging in using the above temporary password.</p>
+        <br />
+        <p>Please contact the system administrator at <a href='calgaryjains@gmail.com'>calgaryjains@gmail.com</a> if you have any issues.</p>
+        <p>Jain Society Of Calgary</p>`
+      };        
+    } else if(type === 'Activation') {
+      const URL = `http://localhost:3000/activation/&${token}`
+      message = {
+        from: process.env.EMAIL_ACCOUNT,
+        to: email,
+        subject: 'JSOC - Activation Request',
+        html: `
+        <h4><b>Jain Society of Calgary</b></h4> 
+        <br /> 
+        <p> Click the link below to activate your JSOC Login Id</p>
+        <br />
+        <p> This link will expire in 24 hours and can only be used once</p>
+        <br /> 
+        <p>If the button above doesn’t work, paste this link into your web browser:</p>
+        <p>${URL}</p>
+        <p>Please contact the system administrator at <a href='calgaryjains@gmail.com'>calgaryjains@gmail.com</a> if you have any issues.</p>
+        <p>Jain Society Of Calgary</p>`
+      };
+      console.log(message); 
     };
+
     return new Promise(function(resolve, reject) {
       return transporter.sendMail(message, function(error, info) {
       if (error) {
@@ -98,11 +121,27 @@ const updatePassword = (id, newPassword) => {
   });
 };
 
+const createActivationRecord = (email, token1) => {
+  initQueryVars(queryString, queryParams);
+  queryParams = [email, token1];
+  queryString = `INSERT INTO activation (email, activation_token) VALUES (?, ?);`;
+  return new Promise(function(resolve, reject) {
+    return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
+      if(error) {
+        return reject(error)
+      }
+      return resolve(rows);
+    });  
+  });
+
+};
+
 /** Module Exports */
 module.exports = {
   generateRandomString,
   getUserByEmail,
   addNewUser,
   updatePassword,
-  sendPasswordResetEmail,
+  sendEmail,
+  createActivationRecord,
 };
