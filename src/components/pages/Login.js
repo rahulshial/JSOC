@@ -1,5 +1,6 @@
 /** React Imports */
-import React from 'react';
+import React, { useEffect } from 'react';
+import axios from 'axios';
 
 /** Material UI imports */
 import Button from '@material-ui/core/Button';
@@ -82,7 +83,39 @@ const useStyles = makeStyles((theme) => ({
 export function Login() {
   const classes = useStyles();
   const passwordMeterColor = [`${classes.class1}`, `${classes.class2}`,`${classes.class3}`,`${classes.class4}`,`${classes.class5}`];
-  const { state, setEmail, setPassword, setPasswordConfirmation, changeState, processEvent, handleChange } = useApplicationData();
+  const { state, setState, setEmail, setPassword, setPasswordConfirmation, changeState, processEvent, handleChange } = useApplicationData();
+
+  useEffect(() => {
+    if(window.location.pathname.toString().includes('activation')) {
+      const activationData = window.location.pathname.split("/").pop().split(":");
+      const activationDataObj = {
+        email: activationData[0],
+        activationToken: decodeURIComponent(activationData[1]),
+        authToken: decodeURIComponent(activationData[2]),
+      };
+      axios
+      .post('/users/activate', activationDataObj)
+      .then((res) => {
+        if(res.status === 200) {
+          setState((prev) => ({
+            ...prev,
+            errorFlag: true,
+            errorText: 'Account Activated, create a password!.',
+            errorBarColor: 'primary',
+            email: activationDataObj.email,
+            functionState: 'createAccount',
+            mainButtonText: 'Create Password',
+            secondButtonText: '',
+            thirdButtonText: '',
+          }));
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -98,17 +131,18 @@ export function Login() {
           </div>
           : <></>}
         <form className={classes.form} validate='true'>
+        {state.functionState !== 'createAccount'?
           <TextField 
             variant="outlined"
-            margin="normal" 
-            required fullWidth id="email" 
+            margin="normal"
+            required fullWidth id="email"
             type="email"
-            label="Email Address" 
-            name="email" 
-            autoComplete="email" 
-            autoFocus 
-            onChange={setEmail}/>
-          {state.functionState === 'signIn'|| state.functionState === 'signUp'?
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            onChange={setEmail}/>:<></>}
+          {state.functionState === 'signIn'|| state.functionState === 'createAccount'?
             <TextField 
               variant="outlined" 
               margin="normal" 
@@ -121,7 +155,7 @@ export function Login() {
               onCopy={(event) => {handleChange(event)}}
               onChange={setPassword}/>
               : <></>}
-          {state.functionState === 'signUp'?
+          {state.functionState === 'createAccount'?
             <div>
               <TextField 
                 variant="outlined" 

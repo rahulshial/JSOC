@@ -126,10 +126,10 @@ const updatePassword = (id, newPassword) => {
   });
 };
 
-const createActivationRecord = (email, password, activation_token, auth_token) => {
+const createActivationRecord = (email, activation_token, auth_token) => {
   initQueryVars(queryString, queryParams);
-  queryParams = [email, password, 'MEM', activation_token, auth_token];
-  queryString = `INSERT INTO activation (email, password, type, activation_token, auth_token) VALUES (?, ?, ?, ?, ?);`;
+  queryParams = [email, activation_token, auth_token];
+  queryString = `INSERT INTO activation (email, activation_token, auth_token) VALUES (?, ?, ?);`;
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
       if(error) {
@@ -144,7 +144,7 @@ const getUserActivationRecord = (email) => {
   initQueryVars(queryString, queryParams);
   queryParams = [email];
   queryString = `
-  SELECT id, email, password, type, activation_token, auth_token FROM activation
+  SELECT id, email, activation_token, auth_token FROM activation
   WHERE email = ?;`;
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {

@@ -18,7 +18,6 @@ Router.get("/:email&:password", (req, res) => {
     message: "Email or password missing!."
     });
   };
-
   helperFunction.getUserByEmail(email)
   .then((rows) => {
     if(rows.length === 0) {
@@ -47,7 +46,7 @@ Router.get("/:email&:password", (req, res) => {
 });
 
 
-/** SIGN UP Route*/
+/** CREATE ACCOUNT Route*/
 Router.post("/:email&:password", (req, res) => {
   const decodedPassword = decodeURIComponent(req.params.password);
   password = bcrypt.hashSync(decodedPassword, 10);
@@ -64,16 +63,15 @@ Router.post("/:email&:password", (req, res) => {
       helperFunction.addNewUser(email, password, type)
       .then((rows) => {
         if(rows.insertId) {
-          res.status(201).send({
+          res.status(200).send({
             message: "User Created!"
           });
         }
       }) 
     } else {
-      res.status(200).send({
+      res.status(201).send({
         message: "User already exists!"
       });
-      res.send('user exists');
     };
   })
   .catch((error) => {
@@ -158,19 +156,21 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
   });
 });
 
-Router.post('/signUpActivationLink', (req, res) => {
-  const email = req.body.email;
-  const decodedPassword = decodeURIComponent(req.body.password);
-  const password = bcrypt.hashSync(decodedPassword, 10);
+/** SIGN UP ACTIVATION LINK EMAIL Route */
+Router.post('/signUpActivationLink/:email', (req, res) => {
+  const email = req.params.email;
+  console.log(email);
   helperFunction.getUserByEmail(email)
   .then((rows) => {
     if(rows.length === 0) {
-      const activation_token = helperFunction.generateRandomString(60);
-      const auth_token = helperFunction.generateRandomString(30);
-      helperFunction.createActivationRecord(email, password, activation_token, auth_token)
+      const token1 = helperFunction.generateRandomString(60);
+      const activationToken = bcrypt.hashSync(token1, 10);
+      const token2 = helperFunction.generateRandomString(30);
+      const authToken = bcrypt.hashSync(token2, 10);
+      helperFunction.createActivationRecord(email, activationToken, authToken)
       .then((rows) => {
         if(rows.insertId) {
-          helperFunction.sendEmail('Activation', email, activation_token, auth_token)
+          helperFunction.sendEmail('Activation', email, token1, token2)
           .then((info) => {
             res.status(200).send({
               message: "Activaton Email Sent!"
@@ -192,6 +192,7 @@ Router.post('/signUpActivationLink', (req, res) => {
   });  
 });
 
+/**PROCESS ACTIVATON LINK FROM EMAIL Route */
 Router.post('/activate', (req, res) => {
   const email = req.body.email;
   const activationToken = req.body.activationToken;
@@ -207,32 +208,20 @@ Router.post('/activate', (req, res) => {
       console.log('Got User Activation Record...');
       const activationTokenFromDB = rows[0].activation_token;
       const authTokenFromDB = rows[0].auth_token;
-      const password = rows[0].password;
-      const type = rows[0].type;
-      console.log('Activation Token        : ', activationToken);
-      console.log('Activation Token from DB: ', activationTokenFromDB);
-      console.log('Auth Token              : ', authToken);
-      console.log('Auth Token from DB      : ', authTokenFromDB);
-      if (activationToken === activationTokenFromDB && authToken === authTokenFromDB) {
-        console.log('Adding new user...');
-        helperFunction.addNewUser(email, password, type)
+      if ((bcrypt.compareSync(activationToken,activationTokenFromDB)) && (bcrypt.compareSync(authToken,authTokenFromDB))) {
+        console.log('Deleting Activation Record...');
+        helperFunction.deleteUserActivationRecord(email)
         .then((rows) => {
-          if(rows.insertId) {
-            console.log('New user ADDED successfully...deleting activation record');
-            helperFunction.deleteUserActivationRecord(email)
-            .then((rows) => {
-              if(rows.affectedRows === 1) {
-                console.log('user activated')
-                res.status(200).send({
-                  message: 'User Activated',
-                })
-              } else {
-                console.log('error deleting activation record')
-                res.status(500).send({
-                  message: "Server Error!"
-                });
-              };
+          if(rows.affectedRows === 1) {
+            console.log('user activated')
+            res.status(200).send({
+              message: 'User Activated',
             })
+          } else {
+            console.log('error deleting activation record')
+            res.status(500).send({
+              message: "Server Error!"
+            });
           };
         })
       };

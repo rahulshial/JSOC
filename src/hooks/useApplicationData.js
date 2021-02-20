@@ -24,10 +24,17 @@ export default function useApplicationData() {
     passwordStrengthScore: '',
     passwordStrength: '',
   });
-  const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
 
+  const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
   const regexCheck = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()+=-\?;,./{}|\":<>\[\]\\\' ~_]).{8,50}/;
-  
+
+  const validateRegexFunction = (password) => {
+    if (!password) {
+      return false;
+    };
+    return regexCheck.test(password);
+  };
+
   const setEmail = (event) => {
     setState((prev) => ({
       ...prev,
@@ -102,7 +109,7 @@ export default function useApplicationData() {
       setState((prev) => ({
         ...prev,
         functionState: 'signUp',
-        mainButtonText: 'Create Account',
+        mainButtonText: 'Sign Up',
         secondButtonText: 'Sign In?',
         thirdButtonText: ''
       }));
@@ -125,7 +132,9 @@ export default function useApplicationData() {
       passwordResetProcess();
     } else if(state.functionState === 'signUp') {
       signUpProcess();
-    }
+    } else if(state.functionState === 'createAccount') {
+      createAccount();
+    };
   };
 
   const signInProcess = () => {
@@ -148,7 +157,7 @@ export default function useApplicationData() {
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
-        } else if (res.status === 206 || res.status === 206) {
+        } else if (res.status === 204 || res.status === 206) {
           setState((prev) => ({
             ...prev,
             errorFlag: true,
@@ -183,6 +192,7 @@ export default function useApplicationData() {
           errorFlag: true,
           errorText: 'Please check your email for password reset email!',
           errorBarColor: 'primary',
+          email: '',
           functionState: 'signIn',
           mainButtonText: 'Sign In',
           secondButtonText: 'Forgot Password?',
@@ -199,17 +209,45 @@ export default function useApplicationData() {
     });
   };
 
-
-  const validateRegexFunction = (password) => {
-    if (!password) {
-      return false;
-    };
-    return regexCheck.test(password);
+  const signUpProcess = () => {
+    axios
+    .post(`/users/signUpActivationLink/${state.email}`)
+    .then((res) => {
+      if(res.status === 200) {
+        setState((prev) => ({
+          ...prev,
+          email: '',
+          password:'',
+          passwordConfirmation:'',
+          errorFlag: true,
+          errorText: 'Please check your Inbox / Spam folder for the ACTIVATION email!',
+          errorBarColor: 'primary',
+          functionState: 'signIn',
+          mainButtonText: 'Sign In',
+          secondButtonText: 'Forgot Password?',
+          thirdButtonText: "Don't have an account? Sign Up",
+        }));  
+      } else if(res.status === 201) {
+        setState((prev) => ({
+          ...prev,
+          errorFlag: true,
+          errorText: 'User Already Exists. Consider Signing In!!!',
+        }));
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      setState((prev) => ({
+        ...prev,
+        errorFlag: true,
+        errorText: 'Server Error. Please try again later!!!',
+      }));
+    });
   };
 
-  const signUpProcess = () => {
+  const createAccount = () => {
+    console.log(state.email, state.password, state.passwordConfirmation);
     const validRegex = validateRegexFunction(state.password);
-    console.log(validRegex);
     if (!state.email || !state.password || !state.passwordConfirmation){
       setState((prev) => ({
         ...prev,
@@ -236,37 +274,24 @@ export default function useApplicationData() {
         errorText: 'Password - at least 8 characters and contain 1 uppercase, 1 lowercase, 1 number and 1 special character!',
       }));
     } else {
-      const activationDataObj = {
-        email: state.email,
-        encodedPassword: encodeURIComponent(state.password)
-      }
+        const encodedPassword = encodeURIComponent(state.password);
       axios
-      // .post(`/users/${state.email}&${encodedPassword}`)
-      // .post(`/users/signUpActivationLink/${state.email}&${encodedPassword}`)
-      .post(`/users/signUpActivationLink`, activationDataObj)
+      .post(`/users/${state.email}&${encodedPassword}`)
       .then((res) => {
-        if(res.status === 200) {
-          setState((prev) => ({
-            ...prev,
-            email: '',
-            password:'',
-            passwordConfirmation:'',
-            errorFlag: true,
-            errorText: 'Please check your Inbox / Spam folder for the ACTIVATION email!',
-            errorBarColor: 'primary',
-            functionState: 'signIn',
-            mainButtonText: 'Sign In',
-            secondButtonText: 'Forgot Password?',
-            thirdButtonText: "Don't have an account? Sign Up",
-          }));
-  
-        } else if(res.status === 201) {
+        if (res.status === 200) {
+          const email = state.email;
+          const type = res.data.rows[0].type;
+          setCookie("userLogged", { email, type }, { path: "/" });
+          history.push('/');
+          history.go(history.length - 1);
+          window.location.reload();
+        } else if (res.status === 201) {
           setState((prev) => ({
             ...prev,
             errorFlag: true,
-            errorText: 'User Exists. Consider Signing In!!!',
+            errorText: 'User already exists. Cannot create! Please Sign In!',
           }));
-        }
+        };
       })
       .catch((error) => {
         console.log(error);
