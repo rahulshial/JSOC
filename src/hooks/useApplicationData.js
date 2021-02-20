@@ -280,7 +280,7 @@ export default function useApplicationData() {
       .then((res) => {
         if (res.status === 200) {
           const email = state.email;
-          const type = res.data.rows[0].type;
+          const type = 'MEM';
           setCookie("userLogged", { email, type }, { path: "/" });
           history.push('/');
           history.go(history.length - 1);

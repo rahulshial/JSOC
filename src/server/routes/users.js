@@ -159,7 +159,6 @@ Router.post('/changePassword/:email&:currPassword&:newPassword', (req, res) => {
 /** SIGN UP ACTIVATION LINK EMAIL Route */
 Router.post('/signUpActivationLink/:email', (req, res) => {
   const email = req.params.email;
-  console.log(email);
   helperFunction.getUserByEmail(email)
   .then((rows) => {
     if(rows.length === 0) {
@@ -200,25 +199,20 @@ Router.post('/activate', (req, res) => {
   helperFunction.getUserActivationRecord(email)
   .then((rows) => {
     if(rows.length === 0) {
-      console.log('no activation record found')
       res.status(204).send({
         message: "User not found!!"
       });
     } else {
-      console.log('Got User Activation Record...');
       const activationTokenFromDB = rows[0].activation_token;
       const authTokenFromDB = rows[0].auth_token;
       if ((bcrypt.compareSync(activationToken,activationTokenFromDB)) && (bcrypt.compareSync(authToken,authTokenFromDB))) {
-        console.log('Deleting Activation Record...');
         helperFunction.deleteUserActivationRecord(email)
         .then((rows) => {
           if(rows.affectedRows === 1) {
-            console.log('user activated')
             res.status(200).send({
               message: 'User Activated',
             })
           } else {
-            console.log('error deleting activation record')
             res.status(500).send({
               message: "Server Error!"
             });

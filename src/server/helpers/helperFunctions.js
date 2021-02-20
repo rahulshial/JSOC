@@ -101,7 +101,6 @@ const addNewUser = (email, password, type) => {
   initQueryVars(queryString, queryParams);
   queryParams = [email, password, type];
   queryString = `INSERT INTO users (email, password, type) VALUES (?, ?, ?);`;
-  console.log(queryParams);
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
       if(error) {

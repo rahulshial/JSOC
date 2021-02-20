@@ -43,10 +43,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
   },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
@@ -78,6 +74,9 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#006400',
     color: '#006400',
   },
+  gridContainer: {
+    cursor: 'pointer',
+  }
 }));
 
 export function Login() {
@@ -200,10 +199,20 @@ export function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link id="secondButton" variant="body2" onClick={changeState}>{state.secondButtonText}</Link>
+              <Link 
+                className={classes.gridContainer} 
+                id="secondButton" 
+                variant="body2" 
+                onClick={changeState}>{state.secondButtonText}
+              </Link>
             </Grid>
             <Grid item>
-              <Link id="thirdButton" variant="body2" onClick={changeState}>{state.thirdButtonText}</Link>
+              <Link
+                className={classes.gridContainer}
+                id="thirdButton"
+                variant="body2"
+                onClick={changeState}>{state.thirdButtonText}
+              </Link>
             </Grid>
           </Grid>
         </form>
