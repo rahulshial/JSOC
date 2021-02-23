@@ -7,7 +7,7 @@ import {
 
 import './App.css';
 
-import { Navbar, AboutUs, ContactUs, Events, ExecutiveArea, Home, Login, MemberArea, News, Resources} from './components'
+import { Navbar, Home, AboutUs, ContactUs, Events, ExecutiveArea, Login, MemberArea, News, Resources} from './components'
 
 
 function App() {

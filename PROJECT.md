@@ -134,3 +134,5 @@ Sign-up functionality:
     - accept and verify password
     - create user record, and log him in to the system
     - delete activation record from activation table.
+
+Forum page - Question posted, can go as an email to the entire community. If people complain we can take them off the list.

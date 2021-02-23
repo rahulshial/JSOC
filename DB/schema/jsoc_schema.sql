@@ -11,7 +11,9 @@ USE `jsoc_db` ;
 DROP TABLE IF EXISTS `users` CASCADE;
 DROP TABLE IF EXISTS 'news_announcements' CASCADE;
 DROP TABLE IF EXISTS `activation` CASCADE;
-
+DROP TABLE IF EXISTS `events` CASCADE;
+DROP TABLE IF EXISTS `links` CASCADE;
+DROP TABLE IF EXISTS 'blog_posts' CASCADE;
 
 -- -----------------------------------------------------
 -- Table `users`
@@ -42,5 +44,44 @@ CREATE TABLE IF NOT EXISTS `news_announcements` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` TEXT NOT NULL,
   `message` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
+
+-- -----------------------------------------------------
+-- Table `events`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `news_announcements` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `description` VARCHAR(255) NOT NULL,,
+  `venue` VARCHAR(255) NOT NULL,
+  `start_date` DATE NOT NULL,
+  `send_date` DATE NOT NULL,
+  `start_time` TIME NOT NULL,
+  `end _time` TIME NOT NULL,
+  `rsvp_required` BOOLEAN DEFAULT FALSE
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
+
+-- -----------------------------------------------------
+-- Table `links`
+-- store newsletter, and other documents links
+-- store resource links
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `links` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `type` TEXT NOT NULL,
+  `url` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
+  
+-- -----------------------------------------------------
+-- Table `blog_posts`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `blog_posts` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `author` VARCHAR(255) NOT NULL,
+  `date` DATETIME NOT NULL,
+  `content` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
