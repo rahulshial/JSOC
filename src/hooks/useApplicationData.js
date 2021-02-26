@@ -23,6 +23,7 @@ export default function useApplicationData() {
     errorBarColor: 'secondary',
     passwordStrengthScore: '',
     passwordStrength: '',
+    events: '',
   });
 
   const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];

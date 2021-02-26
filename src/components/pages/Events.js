@@ -1,26 +1,67 @@
-import React, {useState} from 'react';
-import { DataGrid } from '@material-ui/data-grid';
-import { useDemoData } from '@material-ui/x-grid-data-generator';
+import React, {useEffect} from 'react';
+import axios from 'axios';
+
+/** Material UI Imports */
+
+
+/** Local Imports */
+import useApplicationData from '../../hooks/useApplicationData';
+import { removeUndefinedProps } from '@material-ui/data-grid';
 
 export function Events() {
-  const { data } = useDemoData({
-    dataSet: 'Commodity',
-    rowLength: 10,
-    maxColumns: 6,
-  });
 
-  // TODO: https://github.com/mui-org/material-ui-x/issues/246
-  const [selection, setSelection] = useState([]);
+  const { state, setState } = useApplicationData();
 
+/** use effect
+ * read the data from the events table
+ * display out witnin a container
+ * have edit button. no delete functionality.
+ * on EC/DIR login show add event button
+ */
+
+ useEffect(() => {
+
+  axios
+  .get('/events/getEvents')
+  .then((res) => {
+    if(res.status === 200) {
+      const data = res.data.rows;
+      setState((prev) => ({
+        ...prev,
+        events: data,
+      }))
+    };
+  })
+  .catch((error) => {
+    console.log(error);
+  })
+   // eslint-disable-next-line react-hooks/exhaustive-deps 
+ }, []);
+
+ const displayEvents = () => {
+   const eventsArray = [];
+   if(state.events) {
+
+   }
+   return eventsArray;
+ }
   return (
-    <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        checkboxSelection
-        onSelectionChange={(newSelection) => {
-          setSelection(newSelection.rowIds);
-        }}
-        {...data}
-      />
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Venue</th>
+            <th>Date</th>
+            <th>From</th>
+            <th>To</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>{displayEvents}</tr>
+        </tbody>
+      </table>
     </div>
   );
 };

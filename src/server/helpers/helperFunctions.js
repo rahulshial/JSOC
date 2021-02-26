@@ -170,6 +170,23 @@ const deleteUserActivationRecord = (email) => {
   });
 };
 
+const getEvents = () => {
+  initQueryVars(queryString, queryParams);
+  const todayDate = new Date().toISOString().split('T')[0];
+  queryParams = [todayDate];
+  queryString = `
+  SELECT title, description, venue, start_date, end_date, start_time, end_time, rsvp_required FROM events
+  WHERE start_date >= ?`
+  return new Promise(function(resolve, reject) {
+    return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {
+      if(error) {
+        return reject(error)
+      }
+      return resolve(rows);
+    });
+  });
+};
+
 /** Module Exports */
 module.exports = {
   generateRandomString,
@@ -180,4 +197,5 @@ module.exports = {
   createActivationRecord,
   getUserActivationRecord,
   deleteUserActivationRecord,
+  getEvents,
 };
