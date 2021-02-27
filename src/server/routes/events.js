@@ -6,7 +6,7 @@ const helperFunction = require('../helpers/helperFunctions');
 Router.get("/getEvents", (req, res) => {
   helperFunction.getEvents()
   .then((rows) => {
-    // console.log(rows);
+    console.log(rows);
     res.status(200).send({
       message: "Success",
       rows,
