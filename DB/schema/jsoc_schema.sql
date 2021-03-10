@@ -1,9 +1,9 @@
 -- -----------------------------------------------------
 -- Schema jsoc_db
 -- -----------------------------------------------------
--- DROP DATABASE IF EXISTS `jsoc_db`;
--- CREATE DATABASE IF NOT EXISTS `jsoc_db`;
--- USE `jsoc_db` ;
+DROP DATABASE IF EXISTS `jsoc_db`;
+CREATE DATABASE IF NOT EXISTS `jsoc_db`;
+USE `jsoc_db` ;
 
 -- -----------------------------------------------------
 -- Drop all tables

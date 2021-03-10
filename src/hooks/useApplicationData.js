@@ -140,6 +140,7 @@ export default function useApplicationData() {
 
   const signInProcess = () => {
     const encodedPassword = encodeURIComponent(state.password);
+    console.log(`Password: ${state.password} Encoded Password: ${encodedPassword}`);
     if (!state.email || !state.password){
       setState((prev) => ({
         ...prev,

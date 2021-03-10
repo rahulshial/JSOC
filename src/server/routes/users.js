@@ -12,7 +12,9 @@ let type = '';
 /** SIGN IN Route */
 Router.get("/:email&:password", (req, res) => {
   email = req.params.email;
+  console.log('From REQ: ',req.params.password);
   password = decodeURIComponent(req.params.password);
+  console.log('decoded: ', password);
   if (!email || !password){
     res.status(206).send({
     message: "Email or password missing!."
