@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCookies } from "react-cookie";
 import axios from 'axios';
 
 /** Material UI Imports */
@@ -11,7 +12,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-
+import Button from '@material-ui/core/Button'
 
 /** Local Imports */
 import useApplicationData from '../../hooks/useApplicationData';
@@ -41,6 +42,7 @@ export function Events() {
   const { state, setState } = useApplicationData();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [cookies, setCookie, removeCookie] = useCookies(["name"]);
 
 /** use effect
  * read the data from the events table
@@ -78,6 +80,59 @@ export function Events() {
     setPage(0);
   };
 
+  const loadEvents = () => {
+    // {state.events?
+    //   (state.events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((event) => {
+    //     return (
+    //       <TableRow hover role="checkbox" tabIndex={-1} key={event.id}>
+    //         {columns.map((column) => {
+    //           const value = event[column.id];
+    //           return (
+    //             <TableCell key={column.id} align={column.align}>
+    //               {value}
+    //             </TableCell>
+    //           );
+    //         })}
+    //       </TableRow>
+    //     );
+    //   })):<></>}
+    let value = '';
+    if (state.events) {
+      (state.events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((event) => {
+        return (
+          <TableRow hover role="checkbox" tabIndex={-1} key={event.id}>
+            {columns.map((column) => {
+              if (column.id === 'rsvp') {
+                if(event[column.id]) {
+                  value = <Button> RSVP </Button>
+                } else {
+                  value = 'NA'
+                }
+              } else if(column.id === 'edit') {
+                if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+                  if(cookies.userLogged.type === 'EC' || cookies.userLogged.type === 'DIR' || cookies.userLogged.type === 'ADM') {
+                    value = <Button> EDIT </Button>
+                  } else {
+                    value = '';
+                  }
+                } else {
+                  value = '';
+                }
+              } else {
+                value = event[column.id];
+              };              
+              return (
+                <TableCell key={column.id} align={column.align}>
+                  {value}
+                </TableCell>
+              );
+            })}
+          </TableRow>
+        );
+      }))
+    }
+  };
+
   return (
     <div>
       <Paper className={classes.root}>
@@ -97,21 +152,7 @@ export function Events() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {state.events?
-              (state.events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((event) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={event.id}>
-                    {columns.map((column) => {
-                      const value = event[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })):<></>}
+              {loadEvents}
             </TableBody>
           </Table>
         </TableContainer>
