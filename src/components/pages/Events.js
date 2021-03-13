@@ -33,7 +33,7 @@ const columns = [
   { id: 'from', label: 'From', minWidth: 50 },
   { id: 'to', label: 'To', minWidth: 50 },
   { id: 'venue', label: 'Venue', minWidth: 250 },
-  { id: 'rsvp', label: 'RSVP', minWidth: 100 },
+  { id: 'rsvp_required', label: 'RSVP', minWidth: 100 },
   { id: 'edit', label: 'Edit', minWidth: 100 },
 ];
 
@@ -58,7 +58,6 @@ export function Events() {
     // console.log(res);
     if(res.status === 200) {
       const data = res.data.rows;
-      console.log(data[0].title);
       setState((prev) => ({
         ...prev,
         events: data,
@@ -80,57 +79,60 @@ export function Events() {
     setPage(0);
   };
 
-  const loadEvents = () => {
-    // {state.events?
-    //   (state.events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((event) => {
-    //     return (
-    //       <TableRow hover role="checkbox" tabIndex={-1} key={event.id}>
-    //         {columns.map((column) => {
-    //           const value = event[column.id];
-    //           return (
-    //             <TableCell key={column.id} align={column.align}>
-    //               {value}
-    //             </TableCell>
-    //           );
-    //         })}
-    //       </TableRow>
-    //     );
-    //   })):<></>}
-    let value = '';
-    if (state.events) {
-      (state.events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((event) => {
-        return (
-          <TableRow hover role="checkbox" tabIndex={-1} key={event.id}>
-            {columns.map((column) => {
-              if (column.id === 'rsvp') {
-                if(event[column.id]) {
-                  value = <Button> RSVP </Button>
-                } else {
-                  value = 'NA'
-                }
-              } else if(column.id === 'edit') {
-                if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
-                  if(cookies.userLogged.type === 'EC' || cookies.userLogged.type === 'DIR' || cookies.userLogged.type === 'ADM') {
-                    value = <Button> EDIT </Button>
-                  } else {
-                    value = '';
-                  }
-                } else {
-                  value = '';
-                }
-              } else {
-                value = event[column.id];
-              };              
-              return (
-                <TableCell key={column.id} align={column.align}>
-                  {value}
-                </TableCell>
-              );
-            })}
-          </TableRow>
-        );
-      }))
-    }
+  const getColumnLabel = (column) => {
+    let columnLabel = '';
+    if(column.id === 'rsvp_required') {
+      if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+        if(cookies.userLogged.type === 'MEM') {
+          columnLabel = column.label;
+        } else {
+          columnLabel = ''
+        }
+      } else {
+        columnLabel = column.label
+      }
+    } else if(column.id === 'edit') {
+      if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+        if(cookies.userLogged.type !== 'MEM') {
+          columnLabel = column.label;
+        }
+      } else {
+        columnLabel = ''
+      }
+    } else {
+      columnLabel = column.label
+    };
+    return columnLabel;
+  };
+
+  const getEventValue = (event, column) => {
+    let eventValue = '';
+    if(column.id === 'rsvp_required') {
+      if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+        if(cookies.userLogged.type === 'MEM') {
+          if(event[column.id]) {
+            eventValue = <Button variant="contained" color="primary"> RSVP </Button>
+          }
+        } else {
+          eventValue = '';
+        }
+      } else {
+        if(event[column.id]) {
+          eventValue = <Button variant="contained" color="primary"> RSVP </Button>
+        } else {
+          eventValue = '';
+        }
+      }
+    } else if(column.id === 'edit') {
+        if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+          if(cookies.userLogged.type !== 'MEM') {
+            eventValue = <Button variant="contained" color="secondary"> EDIT </Button>;
+          };
+        };
+      } else {
+        eventValue = event[column.id];
+      };
+    return eventValue;
   };
 
   return (
@@ -140,19 +142,35 @@ export function Events() {
           <Table className={classes.table} size="small" aria-label="a dense table">
             <TableHead>
               <TableRow>
-                {columns.map((column) => (
-                    <TableCell
+                {columns.map((column) => {
+                      const columnLabel = getColumnLabel(column)
+                      return (<TableCell
                       key={column.id}
                       align={column.align}
                       style={{ minWidth: column.minWidth }}
                     >
-                      {column.label}
-                    </TableCell>
-                  ))}
+                      {columnLabel}
+                    </TableCell>)
+                  })}
               </TableRow>
             </TableHead>
             <TableBody>
-              {loadEvents}
+            {state.events?
+              (state.events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((event) => {
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={event.id}>
+                    {columns.map((column) => {
+                       const eventValue = getEventValue(event, column)
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {eventValue}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })):<></>}
+
             </TableBody>
           </Table>
         </TableContainer>

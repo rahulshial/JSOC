@@ -172,7 +172,8 @@ const deleteUserActivationRecord = (email) => {
 
 const getEvents = () => {
   initQueryVars(queryString, queryParams);
-  const todayDate = new Date().toISOString().split('T')[0];
+  // const todayDate = new Date().toISOString().split('T')[0];
+  const todayDate = '2021-01-01';
   queryParams = [todayDate];
   queryString = `
   SELECT id, title, description, venue, start_date AS 'date', end_date, start_time AS 'from', end_time AS 'to', rsvp_required FROM events

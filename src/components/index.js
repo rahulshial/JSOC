@@ -13,3 +13,7 @@ export { PersonalInfo } from './pages/memberAreaPages/PersonalInfo';
 export { ChangePassword } from './pages/memberAreaPages/ChangePassword';
 export { MemberNavBar } from './pages/memberAreaPages/MemberNavBar';
 export { Activation } from './pages//Activation';
+export { ExecutiveNavBar } from './pages/executiveAreaPages/ExecutiveNavBar';
+export { ExecutiveReports } from './pages/executiveAreaPages/ExecutiveReports';
+export { ExecutiveStatistics } from './pages/executiveAreaPages/ExecutiveStatistics';
+

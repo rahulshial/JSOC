@@ -56,7 +56,6 @@ export function Navbar() {
   let AuthButton, MemberArea, ExecutiveArea, LoggedInAs;
   if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
     LoggedInAs = <span className="item-nav">You're logged in as {cookies.userLogged.email}</span>
-    console.log(cookies);
     if(cookies.userLogged.type === 'EC') {
       ExecutiveArea = <Link className="item-nav" to="/ExecutiveArea">ExecutiveArea</Link>;
     } else if(cookies.userLogged.type === 'MEM') {
