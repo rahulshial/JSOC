@@ -176,7 +176,7 @@ const getEvents = () => {
   const todayDate = '2021-01-01';
   queryParams = [todayDate];
   queryString = `
-  SELECT id, title, description, venue, start_date AS 'date', end_date, start_time AS 'from', end_time AS 'to', rsvp_required FROM events
+  SELECT id, title, description, venue, start_date AS 'date', end_date, TIME_FORMAT(start_time, "%h %i %p") AS 'from', TIME_FORMAT(end_time, "%h %i %p") AS 'to', rsvp_required FROM events
   WHERE start_date >= ?`
   return new Promise(function(resolve, reject) {
     return sqlConnection.query(queryString, queryParams, (error, rows, fields) => {

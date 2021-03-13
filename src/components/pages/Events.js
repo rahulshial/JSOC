@@ -107,6 +107,27 @@ export function Events() {
 
   const getEventValue = (event, column) => {
     let eventValue = '';
+    if(column.id === 'date') {
+      const options = { 
+        weekday: 'short',
+        month: "short",
+        day: "numeric",
+        year: "numeric" };
+        const date = new Date(event[column.id]);
+        return eventValue = new Intl.DateTimeFormat('en-US', options).format(date);
+    };
+
+    if(column.id === 'from' || column.id === 'to') {
+      const options = { 
+        hour: '2-digit',
+        minute: "2-digit",
+        timeZoneName: "short",
+        hour12: true };
+      // const time = new Date(event[column.id]);
+      // console.log(time);
+      // return eventValue = new Intl.DateTimeFormat('en-US', options).format(event[column.id]);
+    }
+
     if(column.id === 'rsvp_required') {
       if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
         if(cookies.userLogged.type === 'MEM') {
