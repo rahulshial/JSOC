@@ -11,7 +11,8 @@ if (process.env.DATABASE_URL) {
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
     queuelimit: process.env.MYSQL_QUEUELIMIT,
-    connectionlimit: process.env.MYSQL_CONNECTIONLIMIT
+    connectionlimit: process.env.MYSQL_CONNECTIONLIMIT,
+    dateStrings: true
   };
 };
 

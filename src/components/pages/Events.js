@@ -27,14 +27,24 @@ const useStyles = makeStyles({
 });
 
 const columns = [
-  { id: 'title', label: 'Event', minWidth: 100 },
-  { id: 'description', label: 'Description', minWidth: 250 },
-  { id: 'date', label: 'Date', minWidth: 50, format: (value) => value.format('DD-MMM-YYYY')},
+  { id: 'title', label: 'Event', minWidth: 50 },
+  { id: 'description', label: 'Description', minWidth: 50 },
+  { id: 'date', label: 'Date', minWidth: 50 },
   { id: 'from', label: 'From', minWidth: 50 },
   { id: 'to', label: 'To', minWidth: 50 },
-  { id: 'venue', label: 'Venue', minWidth: 250 },
-  { id: 'rsvp_required', label: 'RSVP', minWidth: 100 },
-  { id: 'edit', label: 'Edit', minWidth: 100 },
+  { id: 'venue', label: 'Venue', minWidth: 50 },
+  { id: 'rsvp_required', label: 'RSVP', minWidth: 50 },
+  { id: 'edit', label: 'Edit', minWidth: 50 },
+];
+
+const addColumns = [
+  { id: 'title', label: 'Event', minWidth: 50 },
+  { id: 'description', label: 'Description', minWidth: 50 },
+  { id: 'date', label: 'Date', minWidth: 50 },
+  { id: 'from', label: 'From', minWidth: 50 },
+  { id: 'to', label: 'To', minWidth: 50 },
+  { id: 'venue', label: 'Venue', minWidth: 50 },
+  { id: 'rsvp_required', label: 'RSVP', minWidth: 50 },
 ];
 
 export function Events() {
@@ -42,7 +52,7 @@ export function Events() {
   const { state, setState } = useApplicationData();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [cookies, setCookie, removeCookie] = useCookies(["name"]);
+  const [cookies] = useCookies(["name"]);
 
 /** use effect
  * read the data from the events table
@@ -52,6 +62,13 @@ export function Events() {
  */
 
  useEffect(() => {
+  if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
+    setState((prev) => ({
+      ...prev,
+      userLogged: true,
+      userType: cookies.userLogged.type,
+    }))
+  }
   axios
   .get('/events/getEvents')
   .then((res) => {
@@ -82,8 +99,8 @@ export function Events() {
   const getColumnLabel = (column) => {
     let columnLabel = '';
     if(column.id === 'rsvp_required') {
-      if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
-        if(cookies.userLogged.type === 'MEM') {
+      if(state.userLogged) {
+        if(state.userType === 'MEM') {
           columnLabel = column.label;
         } else {
           columnLabel = ''
@@ -92,8 +109,8 @@ export function Events() {
         columnLabel = column.label
       }
     } else if(column.id === 'edit') {
-      if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
-        if(cookies.userLogged.type !== 'MEM') {
+      if(state.userLogged) {
+        if(state.userType !== 'MEM') {
           columnLabel = column.label;
         }
       } else {
@@ -112,25 +129,15 @@ export function Events() {
         weekday: 'short',
         month: "short",
         day: "numeric",
-        year: "numeric" };
+        year: "numeric",
+      };
         const date = new Date(event[column.id]);
         return eventValue = new Intl.DateTimeFormat('en-US', options).format(date);
     };
 
-    if(column.id === 'from' || column.id === 'to') {
-      const options = { 
-        hour: '2-digit',
-        minute: "2-digit",
-        timeZoneName: "short",
-        hour12: true };
-      // const time = new Date(event[column.id]);
-      // console.log(time);
-      // return eventValue = new Intl.DateTimeFormat('en-US', options).format(event[column.id]);
-    }
-
     if(column.id === 'rsvp_required') {
-      if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
-        if(cookies.userLogged.type === 'MEM') {
+      if(state.userLogged) {
+        if(state.userType === 'MEM') {
           if(event[column.id]) {
             eventValue = <Button variant="contained" color="primary"> RSVP </Button>
           }
@@ -145,8 +152,8 @@ export function Events() {
         }
       }
     } else if(column.id === 'edit') {
-        if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
-          if(cookies.userLogged.type !== 'MEM') {
+        if(state.userLogged) {
+          if(state.userType !== 'MEM') {
             eventValue = <Button variant="contained" color="secondary"> EDIT </Button>;
           };
         };
@@ -164,15 +171,17 @@ export function Events() {
             <TableHead>
               <TableRow>
                 {columns.map((column) => {
-                      const columnLabel = getColumnLabel(column)
-                      return (<TableCell
-                      key={column.id}
-                      align={column.align}
-                      style={{ minWidth: column.minWidth }}
+                  const columnLabel = getColumnLabel(column)
+                  return (
+                  <TableCell
+                    key={column.id}
+                    align={column.align}
+                    style={{ minWidth: column.minWidth }}
                     >
-                      {columnLabel}
-                    </TableCell>)
-                  })}
+                    {columnLabel}
+                  </TableCell>
+                  )
+                })}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -196,7 +205,7 @@ export function Events() {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
+          rowsPerPageOptions={[10, 15]}
           component="div"
           count={state.events.length}
           rowsPerPage={rowsPerPage}
@@ -205,6 +214,42 @@ export function Events() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
+      {state.userLogged && state.userType !== 'MEM' ?
+      <div>
+      <h1>Add New Event</h1>
+        <Paper className={classes.root}>
+          <TableContainer component={Paper}>
+            <Table className={classes.table} size="small" aria-label="a dense table">
+              <TableHead>
+                <TableRow>
+                  {addColumns.map((column) => {
+                    return (
+                      <TableCell
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth }}
+                      >
+                      {column.label}
+                    </TableCell>)
+                  })}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+              <TableRow hover role="checkbox" tabIndex={-1} key={1}>
+                    {addColumns.map((column) => {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <input></input>
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+        </div>
+     : <></>}
     </div>
   );
 };

@@ -24,6 +24,8 @@ export default function useApplicationData() {
     passwordStrengthScore: '',
     passwordStrength: '',
     events: '',
+    userLogged: false,
+    userType:'',
   });
 
   const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
