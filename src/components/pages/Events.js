@@ -4,18 +4,11 @@ import axios from 'axios';
 
 /** Material UI Imports */
 import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import Button from '@material-ui/core/Button'
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button } from '@material-ui/core';
 
 /** Local Imports */
 import useApplicationData from '../../hooks/useApplicationData';
+import helperFunction from '../../helpers/HelperFunction';
 
 const useStyles = makeStyles({
   root: {
@@ -24,6 +17,9 @@ const useStyles = makeStyles({
   container: {
     maxHeight: 440,
   },
+  Button: {
+    lineHeight: 1,
+}
 });
 
 const columns = [
@@ -49,17 +45,9 @@ const addColumns = [
 
 export function Events() {
   const classes = useStyles();
-  const { state, setState } = useApplicationData();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const { state, setState, handleEventsChangePage, handleEventsChangeRowsPerPage } = useApplicationData();
+  const { getColumnLabel, getEventValue } = helperFunction();
   const [cookies] = useCookies(["name"]);
-
-/** use effect
- * read the data from the events table
- * display out witnin a container
- * have edit button. no delete functionality.
- * on EC/DIR login show add event button
- */
 
  useEffect(() => {
   if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {
@@ -69,10 +57,10 @@ export function Events() {
       userType: cookies.userLogged.type,
     }))
   }
+  console.log(state);
   axios
   .get('/events/getEvents')
   .then((res) => {
-    // console.log(res);
     if(res.status === 200) {
       const data = res.data.rows;
       setState((prev) => ({
@@ -87,82 +75,6 @@ export function Events() {
    // eslint-disable-next-line react-hooks/exhaustive-deps 
  }, []);
 
-  const handleChangePage = (event, newPage) => {
-   setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  const getColumnLabel = (column) => {
-    let columnLabel = '';
-    if(column.id === 'rsvp_required') {
-      if(state.userLogged) {
-        if(state.userType === 'MEM') {
-          columnLabel = column.label;
-        } else {
-          columnLabel = ''
-        }
-      } else {
-        columnLabel = column.label
-      }
-    } else if(column.id === 'edit') {
-      if(state.userLogged) {
-        if(state.userType !== 'MEM') {
-          columnLabel = column.label;
-        }
-      } else {
-        columnLabel = ''
-      }
-    } else {
-      columnLabel = column.label
-    };
-    return columnLabel;
-  };
-
-  const getEventValue = (event, column) => {
-    let eventValue = '';
-    if(column.id === 'date') {
-      const options = { 
-        weekday: 'short',
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      };
-        const date = new Date(event[column.id]);
-        return eventValue = new Intl.DateTimeFormat('en-US', options).format(date);
-    };
-
-    if(column.id === 'rsvp_required') {
-      if(state.userLogged) {
-        if(state.userType === 'MEM') {
-          if(event[column.id]) {
-            eventValue = <Button variant="contained" color="primary"> RSVP </Button>
-          }
-        } else {
-          eventValue = '';
-        }
-      } else {
-        if(event[column.id]) {
-          eventValue = <Button variant="contained" color="primary"> RSVP </Button>
-        } else {
-          eventValue = '';
-        }
-      }
-    } else if(column.id === 'edit') {
-        if(state.userLogged) {
-          if(state.userType !== 'MEM') {
-            eventValue = <Button variant="contained" color="secondary"> EDIT </Button>;
-          };
-        };
-      } else {
-        eventValue = event[column.id];
-      };
-    return eventValue;
-  };
-
   return (
     <div>
       <Paper className={classes.root}>
@@ -171,7 +83,7 @@ export function Events() {
             <TableHead>
               <TableRow>
                 {columns.map((column) => {
-                  const columnLabel = getColumnLabel(column)
+                  const columnLabel = getColumnLabel(state, column)
                   return (
                   <TableCell
                     key={column.id}
@@ -186,11 +98,11 @@ export function Events() {
             </TableHead>
             <TableBody>
             {state.events?
-              (state.events.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((event) => {
+              (state.events.slice(state.page * state.rowsPerPage, state.page * state.rowsPerPage + state.rowsPerPage).map((event) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={event.id}>
                     {columns.map((column) => {
-                       const eventValue = getEventValue(event, column)
+                       const eventValue = getEventValue(state, event, column)
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {eventValue}
@@ -208,10 +120,10 @@ export function Events() {
           rowsPerPageOptions={[10, 15]}
           component="div"
           count={state.events.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
+          rowsPerPage={state.rowsPerPage}
+          page={state.page}
+          onChangePage={handleEventsChangePage}
+          onChangeRowsPerPage={handleEventsChangeRowsPerPage}
         />
       </Paper>
       {state.userLogged && state.userType !== 'MEM' ?

@@ -4,15 +4,13 @@ import { useCookies } from "react-cookie";
 import { Link, useHistory } from "react-router-dom";
 
 /**Material UI Imports */
-import { makeStyles, AppBar, Toolbar, IconButton, CssBaseline, Button } from '@material-ui/core';
-// import AppBar from '@material-ui/core/AppBar';
-// import Toolbar from '@material-ui/core/Toolbar';
-// import IconButton from '@material-ui/core/IconButton';
+import { makeStyles, AppBar, Toolbar, IconButton, CssBaseline } from '@material-ui/core';
+
 import MenuIcon from '@material-ui/icons/Menu';
-// import CssBaseline from '@material-ui/core/CssBaseline';
 
 /** Local Imports */
 import './Navbar.css';
+import useApplicationData from '../hooks/useApplicationData';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
 export function Navbar() {
   const classes = useStyles();
   const [cookies, setCookie, removeCookie] = useCookies(["name"]);
+  const { state } = useApplicationData();
   const history = useHistory();
 
   const logout = () => {
@@ -51,7 +50,7 @@ export function Navbar() {
     history.push('/');
     history.go(history.length - 1);
     window.location.reload();
-  }
+  };
 
   let AuthButton, MemberArea, ExecutiveArea, LoggedInAs;
   if(Object.keys(cookies).length > 0 && 'userLogged' in cookies) {

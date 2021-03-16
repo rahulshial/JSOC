@@ -26,6 +26,8 @@ export default function useApplicationData() {
     events: '',
     userLogged: false,
     userType:'',
+    page: 0,
+    rowsPerPage: 10,    
   });
 
   const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
@@ -142,7 +144,6 @@ export default function useApplicationData() {
 
   const signInProcess = () => {
     const encodedPassword = encodeURIComponent(state.password);
-    console.log(`Password: ${state.password} Encoded Password: ${encodedPassword}`);
     if (!state.email || !state.password){
       setState((prev) => ({
         ...prev,
@@ -157,6 +158,11 @@ export default function useApplicationData() {
         if (res.status === 200) {
           const email = state.email;
           const type = res.data.rows[0].type;
+          setState((prev) => ({
+            ...prev,
+            userLogged: true,
+            userType: type,
+          }));
           setCookie("userLogged", { email, type }, { path: "/" });
           history.push('/');
           history.go(history.length - 1);
@@ -384,6 +390,21 @@ export default function useApplicationData() {
     };
   };
   
+  const handleEventsChangePage = (event, newPage) => {
+     setState((prev) => ({
+       ...prev,
+       page: newPage
+     }))
+    };
+  
+    const handleEventsChangeRowsPerPage = (event) => {
+      setState((prev) => ({
+        ...prev,
+        rowsPerPage: +event.target.value,
+        page: 0
+      }))
+    };
+
   return {
     state,
     setState,
@@ -397,5 +418,7 @@ export default function useApplicationData() {
     setNewPasswordConfirmation,
     changePassword,
     handleChange,
+    handleEventsChangePage,
+    handleEventsChangeRowsPerPage,
   };
 };
