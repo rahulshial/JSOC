@@ -12,17 +12,6 @@ import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 
-const Copyright = () => {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" to='/'>Jain Society Of Calgary</Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-};
-
 const useStyles = makeStyles((theme) => ({
   form: {
     '& > *': {
@@ -63,17 +52,31 @@ const useStyles = makeStyles((theme) => ({
     top: 'auto',
     bottom: 0,
   },
+  copyright: {
+    color: "white"
+  },
 }));
 
 export function Home() {
   const classes = useStyles();
-
   const [cookies] = useCookies(["name"]);
-
   const [state, setState] = useState({
     message:'',
   });
-
+  const Copyright = () => {
+    return (
+      <Typography 
+        className={classes.copyright}
+        variant="body2" 
+        color="textSecondary" 
+        align="center">
+        {'Copyright © '}
+        <Link color="inherit" to='/'>Jain Society Of Calgary</Link>{' '}
+        {new Date().getFullYear()}
+        {'.'}
+      </Typography>
+    );
+  };
   const newMessageState = (event) => {
     setState((prev) => ({
       ...prev,
