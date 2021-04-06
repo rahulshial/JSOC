@@ -2,14 +2,14 @@ import { useState} from 'react';
 import axios from 'axios';
 import { useCookies } from "react-cookie";
 import { useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+// import { useSelector, useDispatch } from 'react-redux';
 import zxcvbn from 'zxcvbn';
 
 import { signIn } from '../actions';
 
 export default function useApplicationData() {
-  const isLogged = useSelector(state => state.isLogged);
-  const dispatch = useDispatch();
+  // const isLogged = useSelector(state => state.isLogged);
+  // const dispatch = useDispatch();
 
   const [cookies, setCookie] = useCookies(["name"]);
   const history = useHistory();
@@ -169,7 +169,7 @@ export default function useApplicationData() {
             userLogged: true,
             userType: type,
           }));
-          dispatch(signIn);
+          // dispatch(signIn);
           setCookie("userLogged", { email, type }, { path: "/" });
           history.push('/');
           history.go(history.length - 1);
@@ -299,7 +299,7 @@ export default function useApplicationData() {
           const email = state.email;
           const type = 'MEM';
           setCookie("userLogged", { email, type }, { path: "/" });
-          dispatch(signIn);
+          // dispatch(signIn);
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
