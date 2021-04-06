@@ -169,8 +169,8 @@ export default function useApplicationData() {
             userLogged: true,
             userType: type,
           }));
+          dispatch(signIn);
           setCookie("userLogged", { email, type }, { path: "/" });
-          dispatchEvent(signIn);
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
@@ -299,7 +299,7 @@ export default function useApplicationData() {
           const email = state.email;
           const type = 'MEM';
           setCookie("userLogged", { email, type }, { path: "/" });
-          dispatchEvent(signIn);
+          dispatch(signIn);
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();

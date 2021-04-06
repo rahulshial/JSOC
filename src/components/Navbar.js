@@ -11,7 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 /** Local Imports */
 import './Navbar.css';
 import useApplicationData from '../hooks/useApplicationData';
-import { signIn, signOut } from '../actions';
+import { signOut } from '../actions';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,7 +50,7 @@ export function Navbar() {
 
   const logout = () => {
     removeCookie('userLogged');
-    dispatch(signOut);
+    // dispatch(signOut);
     history.push('/');
     history.go(history.length - 1);
     window.location.reload();
