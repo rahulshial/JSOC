@@ -2,7 +2,7 @@
 import React from 'react';
 import { useCookies } from "react-cookie";
 import { Link, useHistory } from "react-router-dom";
-
+import { useSelector, useDispatch } from 'react-redux';
 /**Material UI Imports */
 import { makeStyles, AppBar, Toolbar, IconButton, CssBaseline } from '@material-ui/core';
 
@@ -11,6 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 /** Local Imports */
 import './Navbar.css';
 import useApplicationData from '../hooks/useApplicationData';
+import { signIn, signOut } from '../actions';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,9 +45,12 @@ export function Navbar() {
   const [cookies, setCookie, removeCookie] = useCookies(["name"]);
   const { state } = useApplicationData();
   const history = useHistory();
+  const isLogged = useSelector(state => state.isLogged);
+  const dispatch = useDispatch();
 
   const logout = () => {
     removeCookie('userLogged');
+    dispatch(signOut);
     history.push('/');
     history.go(history.length - 1);
     window.location.reload();

@@ -2,9 +2,15 @@ import { useState} from 'react';
 import axios from 'axios';
 import { useCookies } from "react-cookie";
 import { useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import zxcvbn from 'zxcvbn';
 
+import { signIn } from '../actions';
+
 export default function useApplicationData() {
+  const isLogged = useSelector(state => state.isLogged);
+  const dispatch = useDispatch();
+
   const [cookies, setCookie] = useCookies(["name"]);
   const history = useHistory();
   const [state, setState] = useState({
@@ -32,7 +38,7 @@ export default function useApplicationData() {
 
   const passwordStrengthText = ['Very Weak', 'Weak', 'Could be stronger', 'Strong', 'Very Strong'];
   const regexCheck = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()+=-\?;,./{}|\":<>\[\]\\\' ~_]).{8,50}/;
-
+  
   const validateRegexFunction = (password) => {
     if (!password) {
       return false;
@@ -164,6 +170,7 @@ export default function useApplicationData() {
             userType: type,
           }));
           setCookie("userLogged", { email, type }, { path: "/" });
+          dispatchEvent(signIn);
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
@@ -292,6 +299,7 @@ export default function useApplicationData() {
           const email = state.email;
           const type = 'MEM';
           setCookie("userLogged", { email, type }, { path: "/" });
+          dispatchEvent(signIn);
           history.push('/');
           history.go(history.length - 1);
           window.location.reload();
