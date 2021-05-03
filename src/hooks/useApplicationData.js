@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 // import { useSelector, useDispatch } from 'react-redux';
 import zxcvbn from 'zxcvbn';
 
-import { signIn } from '../actions';
+// import { signIn } from '../actions';
 
 export default function useApplicationData() {
   // const isLogged = useSelector(state => state.isLogged);
