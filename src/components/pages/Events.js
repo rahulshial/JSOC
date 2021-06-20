@@ -32,7 +32,7 @@ const columns = [
   { id: 'rsvp_required', label: 'RSVP', minWidth: 50 },
   { id: 'edit', label: 'Edit', minWidth: 50 },
 ];
-
+ 
 const addColumns = [
   { id: 'title', label: 'Event', minWidth: 50 },
   { id: 'description', label: 'Description', minWidth: 50 },
